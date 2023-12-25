@@ -10,11 +10,11 @@ const sicDefOptionsOp: sicOptions = {
   remove1x1: true,
   irTimeout: 10000
 };
-const sicOptionsOp = Object.assign(sicDefOptionsOp);
+const sicOptionsOp: sicOptions = Object.assign(sicDefOptionsOp);
 
 function convertOptionsToStorageOp(options: sicOptions): sicStorageOptions {
   return {
-    rxImgExtPattern: options.imgExtPattern.toString(),
+    rxImgExtPattern: options.imgExtPattern.source,
     bGetAToImg: options.getAToImg.toString(),
     nmbThumbWidth: options.thumbnailWidth.toString(),
     bRememberSort: options.rememberSort.toString(),
@@ -27,7 +27,7 @@ function convertOptionsToStorageOp(options: sicOptions): sicStorageOptions {
   };
 }
 
-function loadOptionsOp() {
+function loadOptionsToUI() {
   const storageOptions: sicStorageOptions = {
     rxImgExtPattern: '',
     bGetAToImg: '',
@@ -41,6 +41,7 @@ function loadOptionsOp() {
     nmbIRTimeout: '',
   }
   chrome.storage.sync.get(Object.keys(storageOptions), (result) => {
+
     sicOptionsOp.imgExtPattern = new RegExp(result['rxImgExtPattern']);
     sicOptionsOp.getAToImg = result['bGetAToImg'] === 'true';
     sicOptionsOp.thumbnailWidth = Number(result['nmbThumbWidth']);
@@ -51,40 +52,36 @@ function loadOptionsOp() {
     sicOptionsOp.bgColor = result['clrBgColor'];
     sicOptionsOp.remove1x1 = result['bRemove1x1'] === 'true';
     sicOptionsOp.irTimeout = Number(result['nmbIRTimeout']);
+
+    const txtImgExtPattern = <HTMLInputElement>document.getElementById('txtImgExtPattern');
+    const chkGetAToImg = <HTMLInputElement>document.getElementById('chkGetAToImg');
+    const nmbThumbWidth = <HTMLInputElement>document.getElementById('nmbThumbWidth');
+    const chkRememberSort = <HTMLInputElement>document.getElementById('chkRememberSort');
+    const rdoBIChecker = <HTMLInputElement>document.getElementById('rdoBIChecker');
+    const rdoBIWhite = <HTMLInputElement>document.getElementById('rdoBIWhite');
+    const rdoBIBlack = <HTMLInputElement>document.getElementById('rdoBIBlack');
+    const rdoBICustom = <HTMLInputElement>document.getElementById('rdoBICustom');
+    const clrBIColor = <HTMLInputElement>document.getElementById('clrBIColor');
+    const chkRemove1x1 = <HTMLInputElement>document.getElementById('chkRemove1x1');
+    const nmbIRTimeout = <HTMLInputElement>document.getElementById('nmbIRTimeout');
+  
+    txtImgExtPattern.value = sicOptionsOp.imgExtPattern.source;
+    chkGetAToImg.checked = sicOptionsOp.getAToImg;
+    nmbThumbWidth.value = sicOptionsOp.thumbnailWidth.toString();
+    chkRememberSort.checked = sicOptionsOp.rememberSort;
+    if(sicOptionsOp.bgChecker) {
+      rdoBIChecker.checked = true;
+    } else if(/^white$/i.test(sicOptionsOp.bgColor) || /^#(FFF|FFFFFF)$/i.test(sicOptionsOp.bgColor)) {
+      rdoBIWhite.checked = true;
+    } else if(/^black$/i.test(sicOptionsOp.bgColor) || /^#(000|000000)$/.test(sicOptionsOp.bgColor)) {
+      rdoBIBlack.checked = true;
+    } else {
+      rdoBICustom.checked = true;
+    }
+    clrBIColor.value = sicOptionsOp.bgColor;
+    chkRemove1x1.checked = sicOptionsOp.remove1x1;
+    nmbIRTimeout.value = sicOptionsOp.irTimeout.toString();
   });
-}
-
-function loadOptionsToUI() {
-  const txtImgExtPattern = <HTMLInputElement>document.getElementById('txtImgExtPattern');
-  const chkGetAToImg = <HTMLInputElement>document.getElementById('chkGetAToImg');
-  const nmbThumbWidth = <HTMLInputElement>document.getElementById('nmbThumbWidth');
-  const chkRememberSort = <HTMLInputElement>document.getElementById('chkRememberSort');
-  const rdoBIChecker = <HTMLInputElement>document.getElementById('rdoBIChecker');
-  const rdoBIWhite = <HTMLInputElement>document.getElementById('rdoBIWhite');
-  const rdoBIBlack = <HTMLInputElement>document.getElementById('rdoBIBlack');
-  const rdoBICustom = <HTMLInputElement>document.getElementById('rdoBICustom');
-  const clrBIColor = <HTMLInputElement>document.getElementById('clrBIColor');
-  const chkRemove1x1 = <HTMLInputElement>document.getElementById('chkRemove1x1');
-  const nmbIRTimeout = <HTMLInputElement>document.getElementById('nmbIRTimeout');
-
-  loadOptionsOp();
-
-  txtImgExtPattern.value = sicOptionsOp.imgExtPattern.toString();
-  chkGetAToImg.checked = sicOptionsOp.getAToImg;
-  nmbThumbWidth.value = sicOptionsOp.thumbnailWidth.toString();
-  chkRememberSort.checked = sicOptionsOp.rememberSort;
-  if(sicOptionsOp.bgChecker) {
-    rdoBIChecker.checked = true;
-  } else if(/^white$/i.test(sicOptionsOp.bgColor) || /^#(FFF|FFFFFF)$/i.test(sicOptionsOp.bgColor)) {
-    rdoBIWhite.checked = true;
-  } else if(/^black$/i.test(sicOptionsOp.bgColor) || /^#(000|000000)$/.test(sicOptionsOp.bgColor)) {
-    rdoBIBlack.checked = true;
-  } else {
-    rdoBICustom.checked = true;
-  }
-  clrBIColor.value = sicOptionsOp.bgColor;
-  chkRemove1x1.checked = sicOptionsOp.remove1x1;
-  nmbIRTimeout.value = sicOptionsOp.irTimeout.toString();
 }
 
 function saveOptionsFromUI() {
@@ -164,7 +161,9 @@ document.addEventListener('DOMContentLoaded', () => {
         action: 'azo_sic_savedefoptions'
       });
     })();
-    loadOptionsToUI();
+    setTimeout(() => {
+      loadOptionsToUI();
+    }, 100);
   });
 
   // Save clicked

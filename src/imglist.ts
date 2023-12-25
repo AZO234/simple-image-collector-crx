@@ -10,11 +10,11 @@ const sicDefOptionsImgList: sicOptions = {
   remove1x1: true,
   irTimeout: 10000
 };
-const sicOptionsImgList = Object.assign(sicDefOptionsImgList);
+const sicOptionsImgList: sicOptions = Object.assign(sicDefOptionsImgList);
 
 function convertOptionsToStorageImgList(options: sicOptions): sicStorageOptions {
   return {
-    rxImgExtPattern: options.imgExtPattern.toString(),
+    rxImgExtPattern: options.imgExtPattern.source,
     bGetAToImg: options.getAToImg.toString(),
     nmbThumbWidth: options.thumbnailWidth.toString(),
     bRememberSort: options.rememberSort.toString(),
@@ -27,7 +27,7 @@ function convertOptionsToStorageImgList(options: sicOptions): sicStorageOptions 
   };
 }
 
-function loadOptionsImgList() {
+function loadOptionsImgList(message: any) {
   const storageOptions: sicStorageOptions = convertOptionsToStorageImgList(sicOptionsImgList);
   chrome.storage.sync.get(Object.keys(storageOptions), (result) => {
     sicOptionsImgList.imgExtPattern = new RegExp(result['rxImgExtPattern']);
@@ -40,6 +40,8 @@ function loadOptionsImgList() {
     sicOptionsImgList.bgColor = result['clrBgColor'];
     sicOptionsImgList.remove1x1 = result['bRemove1x1'] === 'true';
     sicOptionsImgList.irTimeout = Number(result['nmbIRTimeout']);
+
+    start(message.title, message.url, message.sicitems);
   });
 }
 
@@ -54,8 +56,8 @@ async function getImageInfo(item: sicItem, timeout = 10000): Promise<number> {
       resolve(1);
       return;
     }
-    if(/^data/i.test(item.image.url)) {
-      console.log(`gii: Url is not valid. ${item.image.url}`);
+    if(/^data:/i.test(item.image.url)) {
+      console.log(`gii: Url is data. ${item.image.url}`);
       resolve(2);
       return;
     }
@@ -146,14 +148,13 @@ async function getImageInfo(item: sicItem, timeout = 10000): Promise<number> {
 chrome.runtime.onMessage.addListener((message) => {
   switch(message.action) {
     case 'azo_sic_sendlist':
-      start(message.title, message.url, message.sicoptions, message.sicitems);
+      // load options
+      loadOptionsImgList(message);
       break;
   }
 });
 
-async function start(title: string, url: string, sicoptions: sicOptions, sicWorkItems: sicItem[]) {
-  // load options
-  loadOptionsImgList();
+async function start(title: string, url: string, sicWorkItems: sicItem[]) {
 
   // title
   document.title = 'sic:' + title;

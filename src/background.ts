@@ -23,7 +23,7 @@ const sicDefOptions: sicOptions = {
   remove1x1: true,
   irTimeout: 10000
 };
-const sicOptions = Object.assign(sicDefOptions);
+const sicOptions: sicOptions = Object.assign(sicDefOptions);
 
 interface sicStorageOptions {
   rxImgExtPattern: string;
@@ -40,7 +40,7 @@ interface sicStorageOptions {
 
 function convertOptionsToStorage(options: sicOptions): sicStorageOptions {
   return {
-    rxImgExtPattern: options.imgExtPattern.toString(),
+    rxImgExtPattern: options.imgExtPattern.source,
     bGetAToImg: options.getAToImg.toString(),
     nmbThumbWidth: options.thumbnailWidth.toString(),
     bRememberSort: options.rememberSort.toString(),
@@ -61,22 +61,6 @@ function saveOptionsFromStorage(storageoptions: sicStorageOptions) {
   chrome.storage.sync.set(storageoptions);
 }
 
-function loadOptions() {
-  const storageOptions: sicStorageOptions = convertOptionsToStorage(sicOptions);
-  chrome.storage.sync.get(Object.keys(storageOptions), (result) => {
-    sicOptions.imgExtPattern = new RegExp(result['rxImgExtPattern']);
-    sicOptions.getAToImg = result['bGetAToImg'] === 'true';
-    sicOptions.thumbnailWidth = Number(result['nmbThumbWidth']);
-    sicOptions.rememberSort = result['bRememberSort'] === 'true';
-    sicOptions.sortColmun = result['txtSortColumn'];
-    sicOptions.sortOrder = result['txtSortOrder'];
-    sicOptions.bgChecker = result['bBgChecker'] === 'true';
-    sicOptions.bgColor = result['clrBgColor'];
-    sicOptions.remove1x1 = result['bRemove1x1'] === 'true';
-    sicOptions.irTimeout = Number(result['nmbIRTimeout']);
-  });
-}
-
 // on extension installed
 chrome.runtime.onInstalled.addListener(() => {
   // contextmenu
@@ -91,11 +75,9 @@ chrome.runtime.onInstalled.addListener(() => {
 
 // on click extentions icon
 chrome.action.onClicked.addListener((tab) => {
-  chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
-    if(tabs[0].id) {
-      await chrome.tabs.sendMessage(tabs[0].id, { action: 'azo_sic_collectitems' });
-    }
-  });
+  if(tab.id) {
+    chrome.tabs.sendMessage(tab.id, { action: 'azo_sic_collectitems' });
+  }
 });
 
 // on click contextmenu
@@ -103,11 +85,9 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   if(tab && tab.id) {
     switch(info.menuItemId) {
       case 'azo_sic_ci': 
-        chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
-          if(tabs[0].id) {
-            await chrome.tabs.sendMessage(tabs[0].id, { action: 'azo_sic_collectitems' });
-          }
-        });
+        if(tab.id) {
+          chrome.tabs.sendMessage(tab.id, { action: 'azo_sic_collectitems' });
+        }
         break;
     }
   }
@@ -120,7 +100,7 @@ chrome.runtime.onMessage.addListener((message) => {
     case 'azo_sic_itemscollected':
       chrome.tabs.query({ active: true, currentWindow: true }, (activeTabs) => {
         const activeTab = activeTabs[0];
-        chrome.tabs.create({ url: 'imglist.html' }, (newTab) => {
+        chrome.tabs.create({ url: chrome.runtime.getURL('imglist.html') }, (newTab) => {
           if(newTab.id) {
             newTabId = newTab.id;
             chrome.tabs.move(newTabId, { index: activeTab.index + 1 });

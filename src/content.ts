@@ -19,7 +19,7 @@ interface sicStorageOptionsContent {
 
 function convertOptionsToStorageContent(options: sicOptions): sicStorageOptionsContent {
   return {
-    rxImgExtPattern: options.imgExtPattern.toString(),
+    rxImgExtPattern: options.imgExtPattern.source,
     bGetAToImg: options.getAToImg.toString(),
     bRemove1x1: options.remove1x1.toString(),
   };
@@ -31,6 +31,8 @@ function loadOptionsContent() {
     sicOptionsContent.imgExtPattern = new RegExp(result['rxImgExtPattern']);
     sicOptionsContent.getAToImg = result['bGetAToImg'] === 'true';
     sicOptionsContent.remove1x1 = result['bRemove1x1'] === 'true';
+
+    collectItems();
   });
 }
 
@@ -39,7 +41,6 @@ chrome.runtime.onMessage.addListener((message) => {
     case 'azo_sic_collectitems':
       // load options
       loadOptionsContent();
-      collectItems();
       break;
     }
 });
@@ -320,7 +321,7 @@ async function collectItems(): Promise<number> {
       }
     }
 
-    // 'a' tag include 'img' tag
+    // 'a' tag includes 'img' tag
     for(const aTag of doc.querySelectorAll('a')) {
       const imgs = aTag.querySelectorAll('img');
       if(imgs.length) {
