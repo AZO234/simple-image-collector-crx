@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    .header-row {
+      background-color: #69bbff;
+    }
+    .checked-row {
+      background-color: #ff99ff;
+    }
+    .indeterminate-row {
+      background-color: #fff496;
+    }
+  </style>
+  <title>simple-image-collector</title>
+</head>
+<body>
+  <h1 id="listtitle" class="text-center">simple-image-collector</h1>
+  <table class="table table-bordered table-sm m-3 text-center">
+    <thead>
+      <tr class="header-row">
+        <th scope="col" data-sort="id" class="text-center">ID <i class="bi bi-sort-alpha-down"></i></th>
+        <th scope="col" data-sort="chk" class="text-center">Chk<i class="bi bi-sort-alpha-down"></i></th>
+        <th scope="col" data-sort="tag" class="text-center">Tag<i class="bi bi-sort-alpha-down"></i></th>
+        <th scope="col" data-sort="type" class="text-center">Type<i class="bi bi-sort-alpha-down"></i></th>
+        <th scope="col" data-sort="mime" class="text-center">MIME<i class="bi bi-sort-alpha-down"></i></th>
+        <th scope="col" data-sort="url" class="text-center">URL&Info<i class="bi bi-sort-alpha-down"></i></th>
+      </tr>
+    </thead>
+    <tbody id="table-body" class="text-center">
+    </tbody>
+  </table>
+  <div id="loading" class="text-center">
+    <img src="images/loading.gif" alt="loading">
+  </div>
+  <script src="js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="imglist.js"></script>
+</body>
+</html>
