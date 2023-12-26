@@ -310,8 +310,10 @@ function updateRow(item: sicItem) {
       } else {
         cols[5].innerHTML = `
         <div class="row">
-          <div class="col-3 col-md-6 img-thumbnail" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
-            <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}">
+          <div class="col-3 col-md-6 img-thumbnail"style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
+            <button type="button" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="{item.image.url}">
+              <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}">
+            </button>
           </div>  
           <div class="col-9 col-md-6 text-start">
             ${item.image.width}x${item.image.height}
@@ -358,7 +360,9 @@ function updateRow(item: sicItem) {
         cols[5].innerHTML = `
         <div class="row">
           <div class="col-3 col-md-6 img-thumbnail" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
-            <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}">
+            <button type="button" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="{item.image.url}">
+              <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}">
+            </button>
           </div>
           <div class="col-9 col-md-6 text-start">
             ${item.image.width}x${item.image.height}
@@ -379,6 +383,28 @@ function updateRow(item: sicItem) {
           </div>
         </div>`;
     }
+
+/*
+    // open modal
+    const imgs = cols[5].getElementsByTagName('img');
+    if(imgs && imgs.length > 0) {
+      const img = imgs[0];
+      img.setAttribute('data-bs-toggle', 'modal');
+      img.setAttribute('data-bs-target', '#modal');
+      img.setAttribute('data-img-url', img.src);
+      img.addEventListener('click', function () {
+        const modal = document.getElementById('modal');
+        if(modal) {
+          const modalimgs = modal.getElementsByTagName('img');
+          if(modalimgs && modalimgs.length > 0) {
+            const modalimg = modalimgs[0];
+            const url = this.getAttribute('data-img-url') || '';
+            modalimg.setAttribute('src', url);
+          }
+        }
+      });
+    }
+*/
   }
 }
 
@@ -404,6 +430,21 @@ function updateTable() {
     for(const item of sicItemsImgList) {
       addRow(item);
     }
+
+/*
+    // open modal
+    document.addEventListener('show.bs.modal', function (event) {
+      const button = <HTMLButtonElement>event.srcElement;
+      const url = button.getAttribute('data-sign') || '';
+      const modal = document.getElementById('modal');
+      if(modal) {
+        const img = <HTMLImageElement>modal.querySelector('#modal-image');
+        if(img) {
+          img.setAttribute('src', url);
+        }
+      }
+    });
+*/
   }
 }
 
