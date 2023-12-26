@@ -155,7 +155,6 @@ chrome.runtime.onMessage.addListener((message) => {
 });
 
 async function start(title: string, url: string, sicWorkItems: sicItem[]) {
-
   // title
   document.title = 'sic:' + title;
 
@@ -224,13 +223,13 @@ function getItemFromIndex(index: number): sicItem {
 
 function selectRow(item: sicItem) {
   const row = <HTMLTableRowElement>document.getElementById('row_' + item.index);
-  row.classList.remove('checked-row', 'indeterminate-row');
+  row.classList.remove('table-danger', 'table-warning');
   if ((item.check & 1) === 1) {
-    row.classList.add('checked-row');
+    row.classList.add('table-danger');
     const check = <HTMLInputElement>row.children[1].children[0];
     check.checked = true;
   } else if ((item.check & 2) === 2) {
-    row.classList.add('indeterminate-row');
+    row.classList.add('table-warning');
     const check = <HTMLInputElement>row.children[1].children[0];
     check.indeterminate = true;
   }
@@ -246,8 +245,8 @@ function updateRow(item: sicItem) {
   col.textContent = item.index.toString();
   col.addEventListener('click', function() {
     const row = <HTMLDivElement>this.parentElement;
-    const index = Number(row.id.replace(/row_(\d$)/, "$1"));
-    idClick(sicItemsImgList[index]);
+    const index = Number(row.id.replace(/row_(\d+$)/, "$1"));
+    idClick(getItemFromIndex(index));
   });
 
   // column: Chk
@@ -258,8 +257,8 @@ function updateRow(item: sicItem) {
   check.addEventListener('click', function() {
     const col = <HTMLTableCellElement>this.parentElement;
     const row = <HTMLTableRowElement>col.parentElement;
-    const index = Number(row.id.replace(/row_(\d$)/, "$1"));
-    const item = sicItemsImgList[index];
+    const index = Number(row.id.replace(/row_(\d+$)/, "$1"));
+    const item = getItemFromIndex(index);
     item.check ^= 1;
     selectRow(item);
   });
@@ -416,7 +415,7 @@ function idClick(item: sicItem) {
     item.check |= 2;
     updateRow(item);
     // end indeterminate select
-  } if(indeterminateIndex[0] === item.index) {
+  } else if(indeterminateIndex[0] === item.index) {
     indeterminateIndex[0] = -1;
     item.check &= 1;
     updateRow(item);
@@ -476,7 +475,7 @@ function headerClick(column: string | null): void {
       (async () => {
         await chrome.runtime.sendMessage({
           action: 'azo_sic_saveoptions',
-          options: convertOptionsToStorageImgList(sicOptionsImgList)
+          storageoptions: convertOptionsToStorageImgList(sicOptionsImgList)
         });
       })();
     }
