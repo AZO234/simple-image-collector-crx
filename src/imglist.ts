@@ -47,6 +47,8 @@ function loadOptionsImgList(message: any) {
 
 const sicItemsImgList: sicItem[] = [];
 
+let indeterminateCancel = false;
+
 // Index of the row where indeterminate selection
 let indeterminateIndex = [-1, -1];
 
@@ -205,7 +207,7 @@ async function start(title: string, url: string, sicWorkItems: sicItem[]) {
   updateTable();
 
   // sort
-  if(sicOptionsImgList.rememberSort) {
+  if(sicOptionsImgList.rememberSort && sicOptionsImgList.sortColmun !== '') {
     sicOptionsImgList.sortOrder = (sicOptionsImgList.sortOrder === 'asc') ? 'desc' : 'asc';
     headerClick(sicOptionsImgList.sortColmun);
   }
@@ -247,6 +249,7 @@ function updateRow(item: sicItem) {
     const row = <HTMLDivElement>this.parentElement;
     const index = Number(row.id.replace(/row_(\d+$)/, "$1"));
     idClick(getItemFromIndex(index));
+    return false;
   });
 
   // column: Chk
@@ -298,7 +301,7 @@ function updateRow(item: sicItem) {
         item.image.data = item.image.data.replace(/height\s*=\s*['"]?\d+['"]?/, '');
         cols[5].innerHTML = `
         <div class="row">
-          <div class="col-3 col-md-6 img-thumbnail" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
+          <div class="col-3 col-md-6 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="" data-img-data="${encodeURI(item.image.data)}" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
             ${item.image.data}
           </div>  
           <div class="col-9 col-md-6 text-start">
@@ -310,10 +313,8 @@ function updateRow(item: sicItem) {
       } else {
         cols[5].innerHTML = `
         <div class="row">
-          <div class="col-3 col-md-6 img-thumbnail"style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
-            <button type="button" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="{item.image.url}">
-              <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}">
-            </button>
+          <div class="col-3 col-md-6 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="${item.image.url}" data-img-data="" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
+            <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}">
           </div>  
           <div class="col-9 col-md-6 text-start">
             ${item.image.width}x${item.image.height}
@@ -345,11 +346,15 @@ function updateRow(item: sicItem) {
   } else {
     if(item.image) {
       if(item.tag === 'SVG') {
-        item.image.data = item.image.data.replace(/width\s*=\s*['"]?\d+['"]?/, `width="${sicOptionsImgList.thumbnailWidth}"`);
+        if(/width\s*=\s*['"]?\d+['"]?/.test(item.image.data)) {
+          item.image.data = item.image.data.replace(/width\s*=\s*['"]?\d+['"]?/, `width="${sicOptionsImgList.thumbnailWidth}"`);
+        } else {
+          item.image.data = item.image.data.replace(/(<svg )/i, `$1width="${sicOptionsImgList.thumbnailWidth}" `);
+        }
         item.image.data = item.image.data.replace(/height\s*=\s*['"]?\d+['"]?/, '');
         cols[5].innerHTML = `
         <div class="row">
-          <div class="col-3 col-md-6 img-thumbnail" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
+          <div class="col-3 col-md-6 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="" data-img-data="${encodeURI(item.image.data)}" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
             ${item.image.data}
           </div>  
           <div class="col-9 col-md-6 text-start">
@@ -359,10 +364,8 @@ function updateRow(item: sicItem) {
       } else {
         cols[5].innerHTML = `
         <div class="row">
-          <div class="col-3 col-md-6 img-thumbnail" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
-            <button type="button" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="{item.image.url}">
-              <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}">
-            </button>
+          <div class="col-3 col-md-6 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="${item.image.url}" data-img-data="" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
+            <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}">
           </div>
           <div class="col-9 col-md-6 text-start">
             ${item.image.width}x${item.image.height}
@@ -384,27 +387,34 @@ function updateRow(item: sicItem) {
         </div>`;
     }
 
-/*
-    // open modal
+    // set modal
     const imgs = cols[5].getElementsByTagName('img');
     if(imgs && imgs.length > 0) {
-      const img = imgs[0];
-      img.setAttribute('data-bs-toggle', 'modal');
-      img.setAttribute('data-bs-target', '#modal');
-      img.setAttribute('data-img-url', img.src);
-      img.addEventListener('click', function () {
-        const modal = document.getElementById('modal');
-        if(modal) {
-          const modalimgs = modal.getElementsByTagName('img');
-          if(modalimgs && modalimgs.length > 0) {
-            const modalimg = modalimgs[0];
-            const url = this.getAttribute('data-img-url') || '';
-            modalimg.setAttribute('src', url);
+      const img = <HTMLImageElement>imgs[0];
+      if(img.parentElement) {
+        img.parentElement.addEventListener('click', function () {
+          const modalimg = <HTMLDivElement>document.getElementById('modal-image') || null;
+          if(modalimg) {
+            modalimg.style.background = sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor;
+            modalimg.innerHTML = `<img src="${this.getAttribute('data-img-url')}">`;
           }
+        });
+      }
+    } else {
+      const svgs = cols[5].getElementsByTagName('svg');
+      if(svgs && svgs.length > 0) {
+        const svg = <SVGSVGElement>svgs[0];
+        if(svg.parentElement) {
+          svg.parentElement.addEventListener('click', function () {
+            const modalimg = <HTMLDivElement>document.getElementById('modal-image') || null;
+            if(modalimg) {
+              modalimg.style.background = sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor;
+              modalimg.innerHTML = decodeURI(this.getAttribute('data-img-data') || '');
+            }
+          });
         }
-      });
+      }
     }
-*/
   }
 }
 
@@ -430,62 +440,57 @@ function updateTable() {
     for(const item of sicItemsImgList) {
       addRow(item);
     }
-
-/*
-    // open modal
-    document.addEventListener('show.bs.modal', function (event) {
-      const button = <HTMLButtonElement>event.srcElement;
-      const url = button.getAttribute('data-sign') || '';
-      const modal = document.getElementById('modal');
-      if(modal) {
-        const img = <HTMLImageElement>modal.querySelector('#modal-image');
-        if(img) {
-          img.setAttribute('src', url);
-        }
-      }
-    });
-*/
   }
 }
 
 // Handle ID cell click
 function idClick(item: sicItem) {
-  // indeterminate select start
+  // for twice click event
+  if(indeterminateCancel) {
+    indeterminateCancel = false;
+    return;
+  }
+  // indeterminate select
   if(indeterminateIndex[0] < 0) {
     indeterminateIndex[0] = item.index;
     item.check |= 2;
     updateRow(item);
-    // end indeterminate select
-  } else if(indeterminateIndex[0] === item.index) {
-    indeterminateIndex[0] = -1;
-    item.check &= 1;
-    updateRow(item);
   } else {
     let i = 0;
     if(indeterminateIndex[1] < 0) {
-      let select = 0;
-      indeterminateIndex[1] = item.index;
-      for(i = 0; i < sicItemsImgList.length; i++) {
-        switch(select) {
-          case 0:
-            if(sicItemsImgList[i].index === indeterminateIndex[0] || sicItemsImgList[i].index === indeterminateIndex[1]) {
-              sicItemsImgList[i].check |= 2;
-              select++;
-            }
-            break;
-          case 1:
-            if(sicItemsImgList[i].index === indeterminateIndex[0] || sicItemsImgList[i].index === indeterminateIndex[1]) {
-              sicItemsImgList[i].check |= 2;
-              select++;
-            } else {
-              sicItemsImgList[i].check |= 2;
-            }
-            break;
-          case 2:
-            break;
+      // indeterminate single cancel
+      if(indeterminateIndex[0] === item.index) {
+        indeterminateIndex = [-1, -1];
+        item.check &= 1;
+        // for twice click event
+        indeterminateCancel = true;
+        updateRow(item);
+      // indeterminate select between start and end
+      } else {
+        let select = 0;
+        indeterminateIndex[1] = item.index;
+        for(i = 0; i < sicItemsImgList.length; i++) {
+          switch(select) {
+            case 0:
+              if(sicItemsImgList[i].index === indeterminateIndex[0] || sicItemsImgList[i].index === indeterminateIndex[1]) {
+                sicItemsImgList[i].check |= 2;
+                select++;
+              }
+              break;
+            case 1:
+              if(sicItemsImgList[i].index === indeterminateIndex[0] || sicItemsImgList[i].index === indeterminateIndex[1]) {
+                sicItemsImgList[i].check |= 2;
+                select++;
+              } else {
+                sicItemsImgList[i].check |= 2;
+              }
+              break;
+            case 2:
+              break;
+          }
         }
+        updateTable();
       }
-      updateTable();
     } else {
       // add indeterminate select
       if((item.check & 2) === 0) {
@@ -497,6 +502,8 @@ function idClick(item: sicItem) {
         for(i = 0; i < sicItemsImgList.length; i++) {
           sicItemsImgList[i].check &= 1;
         }
+        // for twice click event
+        indeterminateCancel = true;
         updateTable();
       }
     }
