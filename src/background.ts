@@ -12,7 +12,7 @@ interface sicOptions {
 }
 
 const sicDefOptions: sicOptions = {
-  imgExtPattern: new RegExp(/\.(jpg|jpeg|png|svg|gif|webp|tif|tiff|bmp|ico|psd|raw)(\?.*)*$/i),
+  imgExtPattern: new RegExp(/\.(jpg|jpeg|png|svg|gif|webp|heic|heif|avif|tif|tiff|bmp|ico|psd|raw)(\?.*)*$/i),
   getAToImg: false,
   thumbnailWidth: 128,
   rememberSort: false,

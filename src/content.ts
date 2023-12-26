@@ -5,7 +5,7 @@ interface sicOptionsContent {
 }
 
 const sicDefOptionsContent: sicOptionsContent = {
-  imgExtPattern: new RegExp(/\.(jpg|jpeg|png|svg|gif|webp|tif|tiff|bmp|ico|psd|raw)(\?.*)*$/i),
+  imgExtPattern: new RegExp(/\.(jpg|jpeg|png|svg|gif|webp|heic|heif|avif|tif|tiff|bmp|ico|psd|raw)(\?.*)*$/i),
   getAToImg: false,
   remove1x1: true,
 };
@@ -152,8 +152,71 @@ async function collectItems(): Promise<number> {
       tagIndex++;
     }
 
+    // 'link' tag
+    for(const tag of doc.querySelectorAll('link')) {
+      const linkTag = <HTMLLinkElement>tag;
+      if(/(icon|image)$/.test(linkTag.rel)) {
+        const url = absoluteUrl(linkTag.href);
+        if(isUniqueItem(url)) {
+          const sicLinkTag = getFromAllTag(linkTag);
+          const extRes = url.match(sicOptionsContent.imgExtPattern);
+          if(sicLinkTag) {
+            sicWorkItems.push({
+              tag: sicLinkTag,
+              check: 0,
+              type: 'link',
+              url: url,
+              iframeTag: ifTag,
+              iframeIndex: ifIdx,
+              iframeDepth: ifDpt,
+              image: {
+                url: url,
+                type: extRes && extRes.length > 1 ? extRes[1] : '',
+                mime: '',
+                width: 0,
+                height: 0,
+                inCSS: false
+              }
+            });
+          }
+        }
+      }
+    }
+
+    // 'meta' tag
+    for(const tag of doc.querySelectorAll('meta')) {
+      const metaTag = <HTMLMetaElement>tag;
+      if(/(icon|image)$/.test(metaTag.name)) {
+        const url = absoluteUrl(metaTag.content);
+        if(isUniqueItem(url)) {
+          const sicMetaTag = getFromAllTag(metaTag);
+          const extRes = url.match(sicOptionsContent.imgExtPattern);
+          if(sicMetaTag) {
+            sicWorkItems.push({
+              tag: sicMetaTag,
+              check: 0,
+              type: 'meta',
+              url: url,
+              iframeTag: ifTag,
+              iframeIndex: ifIdx,
+              iframeDepth: ifDpt,
+              image: {
+                url: url,
+                type: extRes && extRes.length > 1 ? extRes[1] : '',
+                mime: '',
+                width: 0,
+                height: 0,
+                inCSS: false
+              }
+            });
+          }
+        }
+      }
+    }
+
     // 'img' tag
-    for(const imgTag of doc.querySelectorAll('img')) {
+    for(const tag of doc.querySelectorAll('img')) {
+      const imgTag = <HTMLImageElement>tag;
       const url = absoluteUrl(imgTag.src);
       if(isUniqueItem(url)) {
         const sicImgTag = getFromAllTag(imgTag);
@@ -180,8 +243,41 @@ async function collectItems(): Promise<number> {
       }
     }
 
+    // 'picture' & 'source' tag
+    for(const taga of doc.querySelectorAll('picture')) {
+      const pictureTag = <HTMLPictureElement>taga;
+      for(const tagb of pictureTag.querySelectorAll('source')) {
+        const sourceTag = <HTMLSourceElement>tagb;
+        const url = absoluteUrl(sourceTag.srcset);
+        if(isUniqueItem(url)) {
+          const sicSourceTag = getFromAllTag(sourceTag);
+          const extRes = url.match(sicOptionsContent.imgExtPattern);
+          if(sicSourceTag) {
+            sicWorkItems.push({
+              tag: sicSourceTag,
+              check: 0,
+              type: 'source',
+              url: url,
+              iframeTag: ifTag,
+              iframeIndex: ifIdx,
+              iframeDepth: ifDpt,
+              image: {
+                url: url,
+                type: extRes && extRes.length > 1 ? extRes[1] : '',
+                mime: '',
+                width: 0,
+                height: 0,
+                inCSS: false
+              }
+            });
+          }
+        }
+      }
+    }
+
     // 'canvas' tag
-    for(const canvasTag of doc.querySelectorAll('canvas')) {
+    for(const tag of doc.querySelectorAll('canvas')) {
+      const canvasTag = <HTMLCanvasElement>tag;
       try {
         const url = canvasTag.toDataURL();
         if(isUniqueItem(url)) {
@@ -255,7 +351,8 @@ async function collectItems(): Promise<number> {
     }
 
     // 'svg' tag
-    for(const svgTag of doc.querySelectorAll('svg')) {
+    for(const tag of doc.querySelectorAll('svg')) {
+      const svgTag = <SVGSVGElement>tag;
       if(isUniqueSVGItem(svgTag)) {
         const sicSvgTag = getFromAllTag(svgTag);
         if(sicSvgTag) {
@@ -281,7 +378,8 @@ async function collectItems(): Promise<number> {
     }
 
     // 'a' tag to image
-    for(const aTag of doc.querySelectorAll('a')) {
+    for(const tag of doc.querySelectorAll('a')) {
+      const aTag = <HTMLAnchorElement>tag;
       const url = absoluteUrl(aTag.href);
       if(isUniqueItem(url)) {
         const sicATag = getFromAllTag(aTag);
@@ -322,7 +420,8 @@ async function collectItems(): Promise<number> {
     }
 
     // 'a' tag includes 'img' tag
-    for(const aTag of doc.querySelectorAll('a')) {
+    for(const tag of doc.querySelectorAll('a')) {
+      const aTag = <HTMLAnchorElement>tag;
       const imgs = aTag.querySelectorAll('img');
       if(imgs.length) {
         const url = absoluteUrl(aTag.href);
@@ -345,7 +444,8 @@ async function collectItems(): Promise<number> {
     }
 
     // iframe tag (recursive)
-    for(const iframeTag of doc.querySelectorAll('iframe')) {
+    for(const tag of doc.querySelectorAll('iframe')) {
+      const iframeTag = <HTMLIFrameElement>tag;
       if(isUniqueIframe(iframeTag)) {
         if(iframeTag.contentDocument) {
           sicIframes.push({

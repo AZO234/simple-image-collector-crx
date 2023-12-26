@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,15 +12,15 @@
 <div class="row">
   <div class="col-none col-md-3"></div>
   <div class="col-12 col-md-6 text-center">
-    <table class="table">
+    <table class="table table-bordered m-3">
       <tbody>
         <tr>
           <td class="bg-primary-subtle">Ext pattern as image (RegExp format)</td>
           <td><input id="txtImgExtPattern" type="text" class="form-text" size="30" placeholder="e.g. /\.(jpg|jpeg)$/"></input></td>
         </tr>
         <tr>
-          <td class="bg-primary-subtle">Get atoimg (image out of page)</td>
-          <td><input id="chkGetAToImg" type="checkbox" class="form-check-input"></input></td>
+          <td class="bg-primary-subtle">Get atoimg (out of pages image link)</td>
+          <td><input id="chkGetAToImg" type="checkbox" class="form-check-input"></td>
         </tr>
         <tr>
           <td class="bg-primary-subtle">Thumbnail width</td>
@@ -78,6 +79,7 @@
   <div class="col-none col-md-3"></div>
 </div>
 <script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/popper.min.js"></script>
 <script type="module" src="options.js"></script>
 </body>
 </html>

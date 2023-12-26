@@ -1,5 +1,5 @@
 const sicDefOptionsImgList: sicOptions = {
-  imgExtPattern: new RegExp(/\.(jpg|jpeg|png|svg|gif|webp|tif|tiff|bmp|ico|psd|raw)(\?.*)*$/i),
+  imgExtPattern: new RegExp(/\.(jpg|jpeg|png|svg|gif|webp|heic|heif|avif|tif|tiff|bmp|ico|psd|raw)(\?.*)*$/i),
   getAToImg: false,
   thumbnailWidth: 128,
   rememberSort: false,
@@ -165,7 +165,7 @@ async function start(title: string, url: string, sicWorkItems: sicItem[]) {
   if(hListTitle) {
     hListTitle.innerHTML = `
       <i class="bi bi-image"></i> Images in :<br>
-      <a href="${url}" target="_blank">${title}</a>`;
+      <a class="link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="${url}" target="_blank">${title}</a>`;
   }
 
   // setup items
@@ -314,7 +314,7 @@ function updateRow(item: sicItem) {
         cols[5].innerHTML = `
         <div class="row">
           <div class="col-3 col-md-6 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="${item.image.url}" data-img-data="" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
-            <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}">
+            <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}" alt="thumbnail">
           </div>  
           <div class="col-9 col-md-6 text-start">
             ${item.image.width}x${item.image.height}
@@ -325,7 +325,7 @@ function updateRow(item: sicItem) {
         </div>
         <div class="row">
           <div class="col-12 text-start">
-            <a href="${item.url}" target="_blank">${displayURL}</a>
+            <a class="link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="${item.url}" target="_blank">${displayURL}</a>
           </div>
         </div>`;
       }
@@ -339,7 +339,7 @@ function updateRow(item: sicItem) {
       </div>
       <div class="row">
         <div class="col-12 text-start">
-          <a href="${item.url}" target="_blank">${displayURL}</a>
+          <a class="link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="${item.url}" target="_blank">${displayURL}</a>
         </div>
       </div>`;
     }
@@ -365,7 +365,7 @@ function updateRow(item: sicItem) {
         cols[5].innerHTML = `
         <div class="row">
           <div class="col-3 col-md-6 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="${item.image.url}" data-img-data="" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
-            <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}">
+            <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}" alt="thumbnail">
           </div>
           <div class="col-9 col-md-6 text-start">
             ${item.image.width}x${item.image.height}
@@ -374,7 +374,7 @@ function updateRow(item: sicItem) {
         </div>
         <div class="row">
           <div class="col-12 text-start">
-            <a href="${item.url}" target="_blank">${displayURL}</a>
+            <a class="link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="${item.url}" target="_blank">${displayURL}</a>
           </div>
         </div>`;
       }
@@ -382,36 +382,33 @@ function updateRow(item: sicItem) {
       cols[5].innerHTML = `
         <div class="row">
           <div class="col-12 text-start">
-            <a href="${item.url}" target="_blank">${displayURL}</a>
+            <a class="link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="${item.url}" target="_blank">${displayURL}</a>
           </div>
         </div>`;
     }
 
     // set modal
-    const imgs = cols[5].getElementsByTagName('img');
-    if(imgs && imgs.length > 0) {
-      const img = <HTMLImageElement>imgs[0];
-      if(img.parentElement) {
-        img.parentElement.addEventListener('click', function () {
-          const modalimg = <HTMLDivElement>document.getElementById('modal-image') || null;
-          if(modalimg) {
+    const modalimg = <HTMLDivElement>document.getElementById('modal-image') || null;
+    if(modalimg) {
+      const imgs = cols[5].getElementsByTagName('img');
+      if(imgs && imgs.length > 0) {
+        const img = <HTMLImageElement>imgs[0];
+        if(img.parentElement) {
+          img.parentElement.addEventListener('click', function () {
             modalimg.style.background = sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor;
-            modalimg.innerHTML = `<img src="${this.getAttribute('data-img-url')}">`;
-          }
-        });
-      }
-    } else {
-      const svgs = cols[5].getElementsByTagName('svg');
-      if(svgs && svgs.length > 0) {
-        const svg = <SVGSVGElement>svgs[0];
-        if(svg.parentElement) {
-          svg.parentElement.addEventListener('click', function () {
-            const modalimg = <HTMLDivElement>document.getElementById('modal-image') || null;
-            if(modalimg) {
+            modalimg.innerHTML = `<img src="${this.getAttribute('data-img-url')}" alt="original image">`;
+          });
+        }
+      } else {
+        const svgs = cols[5].getElementsByTagName('svg');
+        if(svgs && svgs.length > 0) {
+          const svg = <SVGSVGElement>svgs[0];
+          if(svg.parentElement) {
+            svg.parentElement.addEventListener('click', function () {
               modalimg.style.background = sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor;
               modalimg.innerHTML = decodeURI(this.getAttribute('data-img-data') || '');
-            }
-          });
+            });
+          }
         }
       }
     }
