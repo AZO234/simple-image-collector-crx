@@ -2,12 +2,14 @@ interface sicOptionsContent {
   imgExtPattern: RegExp;
   getAToImg: boolean;
   remove1x1: boolean;
+  rTimeout: number;
 }
 
 const sicDefOptionsContent: sicOptionsContent = {
   imgExtPattern: new RegExp(/\.(jpg|jpeg|png|svg|gif|webp|heic|heif|avif|tif|tiff|bmp|ico|psd|raw)(\?.*)*$/i),
   getAToImg: false,
   remove1x1: true,
+  rTimeout: 10000
 };
 const sicOptionsContent = Object.assign(sicDefOptionsContent);
 
@@ -15,6 +17,7 @@ interface sicStorageOptionsContent {
   rxImgExtPattern: string;
   bGetAToImg: string;
   bRemove1x1: string;
+  nmbRTimeout: string;
 }
 
 function convertOptionsToStorageContent(options: sicOptions): sicStorageOptionsContent {
@@ -22,6 +25,7 @@ function convertOptionsToStorageContent(options: sicOptions): sicStorageOptionsC
     rxImgExtPattern: options.imgExtPattern.source,
     bGetAToImg: options.getAToImg.toString(),
     bRemove1x1: options.remove1x1.toString(),
+    nmbRTimeout: options.rTimeout.toString()
   };
 }
 
@@ -31,6 +35,7 @@ function loadOptionsContent() {
     sicOptionsContent.imgExtPattern = new RegExp(result['rxImgExtPattern']);
     sicOptionsContent.getAToImg = result['bGetAToImg'] === 'true';
     sicOptionsContent.remove1x1 = result['bRemove1x1'] === 'true';
+    sicOptionsContent.rTimeout = Number(result['nmbRTimeout']);
 
     collectItems();
   });
@@ -145,6 +150,17 @@ async function collectItems(): Promise<number> {
       return a.href;
     }
 
+    // wait for DOM loaded
+    let waitFlag = true;
+    let waitTime = 0;
+    doc.addEventListener('DOMContentLoaded', function() {
+      waitFlag = false;
+    });
+    while(waitFlag && waitTime < sicOptionsContent.rTimeout) {
+      setTimeout(() => {}, 100);
+      waitTime += 100;
+    }
+
     // get all tags
     const allTags = doc.querySelectorAll('*');
     for(const tag of allTags) {
@@ -155,11 +171,14 @@ async function collectItems(): Promise<number> {
     // 'link' tag
     for(const tag of doc.querySelectorAll('link')) {
       const linkTag = <HTMLLinkElement>tag;
-      if(/(icon|image)$/.test(linkTag.rel)) {
+      if(/(icon|image|preload)$/i.test(linkTag.rel)) {
+        if(/preload/i.test(linkTag.rel) && !/image/i.test(linkTag.as)) {
+          continue;
+        }
         const url = absoluteUrl(linkTag.href);
         if(isUniqueItem(url)) {
           const sicLinkTag = getFromAllTag(linkTag);
-          const extRes = url.match(sicOptionsContent.imgExtPattern);
+          const extRes = (url.match(sicOptionsContent.imgExtPattern) || [])[1] || '';
           if(sicLinkTag) {
             sicWorkItems.push({
               tag: sicLinkTag,
@@ -171,7 +190,7 @@ async function collectItems(): Promise<number> {
               iframeDepth: ifDpt,
               image: {
                 url: url,
-                type: extRes && extRes.length > 1 ? extRes[1] : '',
+                type: extRes,
                 mime: '',
                 width: 0,
                 height: 0,
@@ -186,11 +205,11 @@ async function collectItems(): Promise<number> {
     // 'meta' tag
     for(const tag of doc.querySelectorAll('meta')) {
       const metaTag = <HTMLMetaElement>tag;
-      if(/(icon|image)$/.test(metaTag.name)) {
+      if(/(icon|image)$/i.test(metaTag.name)) {
         const url = absoluteUrl(metaTag.content);
         if(isUniqueItem(url)) {
           const sicMetaTag = getFromAllTag(metaTag);
-          const extRes = url.match(sicOptionsContent.imgExtPattern);
+          const extRes = (url.match(sicOptionsContent.imgExtPattern) || [])[1] || '';
           if(sicMetaTag) {
             sicWorkItems.push({
               tag: sicMetaTag,
@@ -202,7 +221,7 @@ async function collectItems(): Promise<number> {
               iframeDepth: ifDpt,
               image: {
                 url: url,
-                type: extRes && extRes.length > 1 ? extRes[1] : '',
+                type: extRes,
                 mime: '',
                 width: 0,
                 height: 0,
@@ -220,7 +239,7 @@ async function collectItems(): Promise<number> {
       const url = absoluteUrl(imgTag.src);
       if(isUniqueItem(url)) {
         const sicImgTag = getFromAllTag(imgTag);
-        const extRes = url.match(sicOptionsContent.imgExtPattern);
+        const extRes = (url.match(sicOptionsContent.imgExtPattern) || [])[1] || '';
         if(sicImgTag) {
           sicWorkItems.push({
             tag: sicImgTag,
@@ -232,7 +251,7 @@ async function collectItems(): Promise<number> {
             iframeDepth: ifDpt,
             image: {
               url: url,
-              type: extRes && extRes.length > 1 ? extRes[1] : '',
+              type: extRes,
               mime: '',
               width: 0,
               height: 0,
@@ -251,7 +270,7 @@ async function collectItems(): Promise<number> {
         const url = absoluteUrl(sourceTag.srcset);
         if(isUniqueItem(url)) {
           const sicSourceTag = getFromAllTag(sourceTag);
-          const extRes = url.match(sicOptionsContent.imgExtPattern);
+          const extRes = (url.match(sicOptionsContent.imgExtPattern) || [])[1] || '';
           if(sicSourceTag) {
             sicWorkItems.push({
               tag: sicSourceTag,
@@ -263,7 +282,7 @@ async function collectItems(): Promise<number> {
               iframeDepth: ifDpt,
               image: {
                 url: url,
-                type: extRes && extRes.length > 1 ? extRes[1] : '',
+                type: extRes,
                 mime: '',
                 width: 0,
                 height: 0,
@@ -322,11 +341,12 @@ async function collectItems(): Promise<number> {
 
     // backgroung image
     for(const tag of doc.querySelectorAll('*')) {
-      const url = window.getComputedStyle(tag).backgroundImage.replace(/url\(['"]?(.*?)['"]?\)/i, "$1");
-      if(url !== 'none' && url !== '') {
+      const style = window.getComputedStyle(tag); 
+      const url = (style.background.match(/url\(['"](.*?)['"]\)/i) || [])[1] || '';
+      if(url !== '' && url !== 'none') {
         if(isUniqueItem(absoluteUrl(url))) {
           const sicTag = getFromAllTag(tag);
-          const extRes = url.match(sicOptionsContent.imgExtPattern);
+          const extRes = (url.match(sicOptionsContent.imgExtPattern) || [])[1] || '';
           if(sicTag) {
             sicWorkItems.push({
               tag: sicTag,
@@ -338,7 +358,33 @@ async function collectItems(): Promise<number> {
               iframeDepth: ifDpt,
               image: {
                 url: url,
-                type: extRes && extRes.length > 1 ? extRes[1] : '',
+                type: extRes,
+                mime: '',
+                width: 0,
+                height: 0,
+                inCSS: true
+              }
+            });
+          }
+        }
+      }
+      const urla = (style.backgroundImage.match(/url\(['"](.*?)['"]\)/i) || [])[1] || '';
+      if(urla && urla !== '' && urla !== 'none') {
+        if(isUniqueItem(absoluteUrl(urla))) {
+          const sicTag = getFromAllTag(tag);
+          const extRes = (urla.match(sicOptionsContent.imgExtPattern) || [])[1] || '';
+          if(sicTag) {
+            sicWorkItems.push({
+              tag: sicTag,
+              check: 0,
+              type: 'bgimg',
+              url: urla,
+              iframeTag: ifTag,
+              iframeIndex: ifIdx,
+              iframeDepth: ifDpt,
+              image: {
+                url: urla,
+                type: extRes,
                 mime: '',
                 width: 0,
                 height: 0,
@@ -383,8 +429,8 @@ async function collectItems(): Promise<number> {
       const url = absoluteUrl(aTag.href);
       if(isUniqueItem(url)) {
         const sicATag = getFromAllTag(aTag);
-        const extRes = aTag.href.match(sicOptionsContent.imgExtPattern);
-        if(sicATag && extRes && extRes.length > 1) {
+        const extRes = (aTag.href.match(sicOptionsContent.imgExtPattern) || [])[1] || '';
+        if(sicATag && extRes !== '') {
           if(sicOptionsContent.getAToImg) {
             sicWorkItems.push({
               tag: sicATag,
@@ -396,7 +442,7 @@ async function collectItems(): Promise<number> {
               iframeDepth: ifDpt,
               image: {
                 url: url,
-                type: extRes && extRes.length > 1 ? extRes[1] : '',
+                type: extRes,
                 mime: '',
                 width: 0,
                 height: 0,
@@ -414,6 +460,51 @@ async function collectItems(): Promise<number> {
               iframeDepth: ifDpt,
               image: null
             });
+          }
+        }
+      }
+    }
+
+    // 'map' tag
+    for(const tag of doc.querySelectorAll('map')) {
+      const mapTag = <HTMLMapElement>tag;
+      for(const atag of mapTag.querySelectorAll('area')) {
+        const areaTag = <HTMLAreaElement>atag;
+        const url = absoluteUrl(areaTag.href);
+        if(isUniqueItem(url)) {
+          const sicAreaTag = getFromAllTag(areaTag);
+          const extRes = (areaTag.href.match(sicOptionsContent.imgExtPattern) || [])[1] || '';
+          if(sicAreaTag && extRes !== '') {
+            if(sicOptionsContent.getAToImg) {
+              sicWorkItems.push({
+                tag: sicAreaTag,
+                check: 0,
+                type: 'areatoimg',
+                url: url,
+                iframeTag: ifTag,
+                iframeIndex: ifIdx,
+                iframeDepth: ifDpt,
+                image: {
+                  url: url,
+                  type: extRes,
+                  mime: '',
+                  width: 0,
+                  height: 0,
+                  inCSS: false
+                }
+              });
+            } else {
+              sicWorkItems.push({
+                tag: sicAreaTag,
+                check: 0,
+                type: 'areatoimg',
+                url: url,
+                iframeTag: ifTag,
+                iframeIndex: ifIdx,
+                iframeDepth: ifDpt,
+                image: null
+              });
+            }
           }
         }
       }
@@ -446,8 +537,8 @@ async function collectItems(): Promise<number> {
     // iframe tag (recursive)
     for(const tag of doc.querySelectorAll('iframe')) {
       const iframeTag = <HTMLIFrameElement>tag;
-      if(isUniqueIframe(iframeTag)) {
-        if(iframeTag.contentDocument) {
+      if(iframeTag.contentDocument) {
+        if(isUniqueIframe(iframeTag)) {
           sicIframes.push({
             index: ifIdx,
             iframeTag: iframeTag,
@@ -455,7 +546,9 @@ async function collectItems(): Promise<number> {
             iframeDepth: ifDpt
           });
           ifIdx++;
-          processDocument(iframeTag.contentDocument, iframeTag, ifIdx, ifDpt + 1)
+          if(ifDpt < 10) {
+            processDocument(iframeTag.contentDocument, iframeTag, ifIdx, ifDpt + 1);
+          }
         }
       }
     }

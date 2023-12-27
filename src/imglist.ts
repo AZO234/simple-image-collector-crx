@@ -8,7 +8,7 @@ const sicDefOptionsImgList: sicOptions = {
   bgChecker: true,
   bgColor: '#FFFFFF',
   remove1x1: true,
-  irTimeout: 10000
+  rTimeout: 10000
 };
 const sicOptionsImgList: sicOptions = Object.assign(sicDefOptionsImgList);
 
@@ -23,7 +23,7 @@ function convertOptionsToStorageImgList(options: sicOptions): sicStorageOptions 
     bBgChecker: options.bgChecker.toString(),
     clrBgColor: options.bgColor,
     bRemove1x1: options.remove1x1.toString(),
-    nmbIRTimeout: options.irTimeout.toString()
+    nmbRTimeout: options.rTimeout.toString()
   };
 }
 
@@ -39,7 +39,7 @@ function loadOptionsImgList(message: any) {
     sicOptionsImgList.bgChecker = result['bBgChecker'] === 'true';
     sicOptionsImgList.bgColor = result['clrBgColor'];
     sicOptionsImgList.remove1x1 = result['bRemove1x1'] === 'true';
-    sicOptionsImgList.irTimeout = Number(result['nmbIRTimeout']);
+    sicOptionsImgList.rTimeout = Number(result['nmbRTimeout']);
 
     start(message.title, message.url, message.sicitems);
   });
@@ -172,7 +172,7 @@ async function start(title: string, url: string, sicWorkItems: sicItem[]) {
   const loadImageProms: Promise<number>[] = [];
   for(const item of sicWorkItems) {
     if(!/svg/i.test(item.tag) && item.image) {
-      loadImageProms.push(getImageInfo(item, sicOptionsImgList.irTimeout));
+      loadImageProms.push(getImageInfo(item, sicOptionsImgList.rTimeout));
     }
   }
   await Promise.all(loadImageProms);
@@ -276,7 +276,7 @@ function updateRow(item: sicItem) {
 
   // column MIME
   if(item.image) {
-    if(/^image\//.test(item.image.mime)) {
+    if(/^image\//i.test(item.image.mime)) {
       cols[4].innerHTML = '<img src="images/image.png" width="16" alt="image">' + item.image.mime;
     } else {
       cols[4].textContent = item.image.mime;
@@ -293,12 +293,12 @@ function updateRow(item: sicItem) {
   if(item.iframeIndex || item.iframeDepth) {
     if(item.image) {
       if(item.tag === 'SVG') {
-        if(/width\s*=\s*['"]?\d+['"]?/.test(item.image.data)) {
-          item.image.data = item.image.data.replace(/width\s*=\s*['"]?\d+['"]?/, `width="${sicOptionsImgList.thumbnailWidth}"`);
+        if(/width\s*=\s*['"]?\d+['"]?/i.test(item.image.data)) {
+          item.image.data = item.image.data.replace(/width\s*=\s*['"]?\d+['"]?/i, `width="${sicOptionsImgList.thumbnailWidth}"`);
         } else {
           item.image.data = item.image.data.replace(/(<svg )/i, `$1width="${sicOptionsImgList.thumbnailWidth}" `);
         }
-        item.image.data = item.image.data.replace(/height\s*=\s*['"]?\d+['"]?/, '');
+        item.image.data = item.image.data.replace(/height\s*=\s*['"]?\d+['"]?/i, '');
         cols[5].innerHTML = `
         <div class="row">
           <div class="col-3 col-md-6 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="" data-img-data="${encodeURI(item.image.data)}" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
@@ -346,12 +346,12 @@ function updateRow(item: sicItem) {
   } else {
     if(item.image) {
       if(item.tag === 'SVG') {
-        if(/width\s*=\s*['"]?\d+['"]?/.test(item.image.data)) {
-          item.image.data = item.image.data.replace(/width\s*=\s*['"]?\d+['"]?/, `width="${sicOptionsImgList.thumbnailWidth}"`);
+        if(/width\s*=\s*['"]?\d+['"]?/i.test(item.image.data)) {
+          item.image.data = item.image.data.replace(/width\s*=\s*['"]?\d+['"]?/i, `width="${sicOptionsImgList.thumbnailWidth}"`);
         } else {
           item.image.data = item.image.data.replace(/(<svg )/i, `$1width="${sicOptionsImgList.thumbnailWidth}" `);
         }
-        item.image.data = item.image.data.replace(/height\s*=\s*['"]?\d+['"]?/, '');
+        item.image.data = item.image.data.replace(/height\s*=\s*['"]?\d+['"]?/i, '');
         cols[5].innerHTML = `
         <div class="row">
           <div class="col-3 col-md-6 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="" data-img-data="${encodeURI(item.image.data)}" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
@@ -386,29 +386,29 @@ function updateRow(item: sicItem) {
           </div>
         </div>`;
     }
-
-    // set modal
-    const modalimg = <HTMLDivElement>document.getElementById('modal-image') || null;
-    if(modalimg) {
-      const imgs = cols[5].getElementsByTagName('img');
-      if(imgs && imgs.length > 0) {
-        const img = <HTMLImageElement>imgs[0];
-        if(img.parentElement) {
-          img.parentElement.addEventListener('click', function () {
+  }
+ 
+  // set modal
+  const modalimg = <HTMLDivElement>document.getElementById('modal-image') || null;
+  if(modalimg) {
+    const imgs = cols[5].getElementsByTagName('img');
+    if(imgs && imgs.length > 0) {
+      const img = <HTMLImageElement>imgs[0];
+      if(img.parentElement) {
+        img.parentElement.addEventListener('click', function () {
+          modalimg.style.background = sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor;
+          modalimg.innerHTML = `<img src="${this.getAttribute('data-img-url')}" alt="original image">`;
+        });
+      }
+    } else {
+      const svgs = cols[5].getElementsByTagName('svg');
+      if(svgs && svgs.length > 0) {
+        const svg = <SVGSVGElement>svgs[0];
+        if(svg.parentElement) {
+          svg.parentElement.addEventListener('click', function () {
             modalimg.style.background = sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor;
-            modalimg.innerHTML = `<img src="${this.getAttribute('data-img-url')}" alt="original image">`;
+            modalimg.innerHTML = decodeURI(this.getAttribute('data-img-data') || '');
           });
-        }
-      } else {
-        const svgs = cols[5].getElementsByTagName('svg');
-        if(svgs && svgs.length > 0) {
-          const svg = <SVGSVGElement>svgs[0];
-          if(svg.parentElement) {
-            svg.parentElement.addEventListener('click', function () {
-              modalimg.style.background = sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor;
-              modalimg.innerHTML = decodeURI(this.getAttribute('data-img-data') || '');
-            });
-          }
         }
       }
     }

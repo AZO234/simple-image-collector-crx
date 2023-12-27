@@ -8,7 +8,7 @@ interface sicOptions {
   bgChecker: boolean;
   bgColor: string;
   remove1x1: boolean;
-  irTimeout: number;
+  rTimeout: number;
 }
 
 const sicDefOptions: sicOptions = {
@@ -21,7 +21,7 @@ const sicDefOptions: sicOptions = {
   bgChecker: true,
   bgColor: '#FFFFFF',
   remove1x1: true,
-  irTimeout: 10000
+  rTimeout: 10000
 };
 const sicOptions: sicOptions = Object.assign(sicDefOptions);
 
@@ -35,7 +35,7 @@ interface sicStorageOptions {
   bBgChecker: string;
   clrBgColor: string;
   bRemove1x1: string;
-  nmbIRTimeout: string;
+  nmbRTimeout: string;
 }
 
 function convertOptionsToStorage(options: sicOptions): sicStorageOptions {
@@ -49,7 +49,7 @@ function convertOptionsToStorage(options: sicOptions): sicStorageOptions {
     bBgChecker: options.bgChecker.toString(),
     clrBgColor: options.bgColor,
     bRemove1x1: options.remove1x1.toString(),
-    nmbIRTimeout: options.irTimeout.toString()
+    nmbRTimeout: options.rTimeout.toString()
   };
 }
 
