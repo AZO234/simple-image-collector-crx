@@ -5,8 +5,10 @@ const sicDefOptionsImgList: sicOptions = {
   rememberSort: false,
   sortColmun: '',
   sortOrder: '',
+  rememberBg: true,
   bgChecker: true,
   bgColor: '#FFFFFF',
+  useDownloadDir: false,
   remove1x1: true,
   rTimeout: 10000
 };
@@ -20,8 +22,10 @@ function convertOptionsToStorageImgList(options: sicOptions): sicStorageOptions 
     bRememberSort: options.rememberSort.toString(),
     txtSortColumn: options.sortColmun,
     txtSortOrder: options.sortOrder,
+    bRememberBg: options.rememberSort.toString(),
     bBgChecker: options.bgChecker.toString(),
     clrBgColor: options.bgColor,
+    bUseDownloadDir: options.useDownloadDir.toString(),
     bRemove1x1: options.remove1x1.toString(),
     nmbRTimeout: options.rTimeout.toString()
   };
@@ -38,6 +42,7 @@ function loadOptionsImgList(message: any) {
     sicOptionsImgList.sortOrder = result['txtSortOrder'];
     sicOptionsImgList.bgChecker = result['bBgChecker'] === 'true';
     sicOptionsImgList.bgColor = result['clrBgColor'];
+    sicOptionsImgList.useDownloadDir = result['bUseDownloadDir'] === 'true';
     sicOptionsImgList.remove1x1 = result['bRemove1x1'] === 'true';
     sicOptionsImgList.rTimeout = Number(result['nmbRTimeout']);
 
@@ -47,7 +52,9 @@ function loadOptionsImgList(message: any) {
 
 const sicItemsImgList: sicItem[] = [];
 
-let indeterminateCancel = false;
+let searchText = '';
+
+let selectedCount = 0;
 
 // Index of the row where indeterminate selection
 let indeterminateIndex = [-1, -1];
@@ -157,6 +164,21 @@ chrome.runtime.onMessage.addListener((message) => {
 });
 
 async function start(title: string, url: string, sicWorkItems: sicItem[]) {
+  // Background color of image
+  const rdoBgChecker = <HTMLInputElement>document.getElementById('rdoBgChecker');
+  const rdoBgColor = <HTMLInputElement>document.getElementById('rdoBgColor');
+  const clrBgColor = <HTMLInputElement>document.getElementById('clrBgColor');
+  if(sicOptionsImgList.rememberBg) {
+    if(sicOptionsImgList.bgChecker) {
+      rdoBgChecker.checked = true;
+    } else {
+      rdoBgColor.checked = true;
+    }
+  } else {
+    rdoBgChecker.checked = true;
+  }
+  clrBgColor.value = sicOptionsImgList.bgColor;
+
   // title
   document.title = 'sic:' + title;
 
@@ -223,17 +245,21 @@ function getItemFromIndex(index: number): sicItem {
   return sicItemsImgList[i];
 }
 
-function selectRow(item: sicItem) {
-  const row = <HTMLTableRowElement>document.getElementById('row_' + item.index);
-  row.classList.remove('table-danger', 'table-warning');
-  if ((item.check & 1) === 1) {
-    row.classList.add('table-danger');
-    const check = <HTMLInputElement>row.children[1].children[0];
-    check.checked = true;
-  } else if ((item.check & 2) === 2) {
-    row.classList.add('table-warning');
-    const check = <HTMLInputElement>row.children[1].children[0];
-    check.indeterminate = true;
+function updateSelectedCount() {
+  const btnAction = <HTMLButtonElement>document.getElementById('btnAction');
+  const nmbSelectedCount = <HTMLSpanElement>document.getElementById('nmbSelectedCount');
+  const btnClear = <HTMLButtonElement>document.getElementById('btnClear');
+
+  if(selectedCount) {
+    nmbSelectedCount.style.display = 'inline-block';
+    nmbSelectedCount.textContent = selectedCount.toString();
+    btnAction.disabled = false;
+    btnClear.disabled = false;
+  } else {
+    nmbSelectedCount.style.display = 'none';
+    nmbSelectedCount.textContent = '0';
+    btnAction.disabled = true;
+    btnClear.disabled = true;
   }
 }
 
@@ -241,33 +267,100 @@ function updateRow(item: sicItem) {
   const row = <HTMLTableRowElement>document.getElementById('row_' + item.index);
   const cols = row.children;
 
+  // search
+  let bFound = true;
+  item.check |= 0b001;
+  if(searchText !== '') {
+    bFound = false;
+
+    // RegExp
+    if(/^\/.*\//.test(searchText)) {
+      const m = searchText.match(/^\/(.*)\/(.*?)$/) || [];
+      let re = null;
+      switch(m.length) {
+        case 3:
+          try {
+            re = new RegExp(m[1], m[2]);
+          } catch(e) {
+            re = new RegExp('');
+          }
+          break;
+        case 2:  
+          try {
+            re = new RegExp(m[1]);
+          } catch(e) {
+            re = new RegExp('');
+          }
+          break;
+        default:  
+          re = new RegExp('');
+      }
+      if(
+        re.test(item.tag) ||
+        re.test(item.type) ||
+        re.test(item.url)
+      ) {
+        bFound = true;
+      }
+      if(item.image && (
+        re.test(item.image.type) ||
+        re.test(item.image.mime) ||
+        re.test(item.image.url) ||
+        re.test(item.image.data)
+      )) {
+        bFound = true;
+      }
+    } else {
+      if(
+        item.tag.includes(searchText) ||
+        item.type.includes(searchText) ||
+        item.url.includes(searchText)
+      ) {
+        bFound = true;
+      }
+      if(item.image && (
+        item.image.type.includes(searchText) ||
+        item.image.mime.includes(searchText) ||
+        item.image.url.includes(searchText) ||
+        item.image.data.includes(searchText)
+      )) {
+        bFound = true;
+      }
+    }
+    if(!bFound) {
+      item.check &= 0b110;
+    }
+  }
+
   // column: ID
   const col = <HTMLTableCellElement>cols[0];
   col.classList.add('text-end');
   col.textContent = item.index.toString();
-  col.addEventListener('click', function() {
-    const row = <HTMLDivElement>this.parentElement;
-    const index = Number(row.id.replace(/row_(\d+$)/, "$1"));
-    idClick(getItemFromIndex(index));
-    return false;
-  });
 
   // column: Chk
-  cols[1].innerHTML = '';
-  const check = document.createElement('input');
-  check.type = 'checkbox';
-  check.classList.add('form-check-input');
-  check.addEventListener('click', function() {
-    const col = <HTMLTableCellElement>this.parentElement;
-    const row = <HTMLTableRowElement>col.parentElement;
-    const index = Number(row.id.replace(/row_(\d+$)/, "$1"));
-    const item = getItemFromIndex(index);
-    item.check ^= 1;
-    selectRow(item);
-  });
-  cols[1].appendChild(check)
-  selectRow(item);
-
+  const check = <HTMLInputElement>cols[1].children[0];
+  check.indeterminate = false;
+  check.checked = false;
+  row.classList.remove('table-secondary', 'table-danger', 'table-warning');
+  if(item.check & 0b100) {
+    row.classList.remove('table-secondary', 'table-danger', 'table-warning');
+    row.classList.add('table-warning');
+    check.indeterminate = true;
+  }
+  if(item.check & 0b010) {
+    row.classList.remove('table-secondary', 'table-danger', 'table-warning');
+    row.classList.add('table-danger');
+    check.indeterminate = false;
+    check.checked = true;
+  }
+  if(!(item.check & 0b001)) {
+    row.classList.remove('table-secondary', 'table-danger', 'table-warning');
+    row.classList.add('table-secondary');
+  }
+  if((item.check & 0b110) && (item.check & 0b001)) {
+    selectedCount++;
+  };
+  
   // column: Tag
   cols[2].textContent = item.tag;
 
@@ -424,6 +517,33 @@ function addRow(item: sicItem) {
       const col = <HTMLTableCellElement>document.createElement('td');
       row.appendChild(col);
     }
+
+    const col0 = <HTMLTableCellElement>row.children[0];
+    col0.addEventListener('click', function() {
+      const row = <HTMLDivElement>this.parentElement;
+      const index = Number(row.id.replace(/row_(\d+$)/, "$1"));
+      const item = getItemFromIndex(index);
+      idClick(item);
+      return false;
+    });
+
+    const check = <HTMLInputElement>document.createElement('input');
+    check.type = 'checkbox';
+    check.classList.add('form-check-input');
+    check.addEventListener('click', function() {
+      const col = <HTMLTableCellElement>this.parentElement;
+      const row = <HTMLTableRowElement>col.parentElement;
+      const index = Number(row.id.replace(/row_(\d+$)/, "$1"));
+      const item = getItemFromIndex(index);
+      if((item.check & 0b110) && (item.check & 0b001)) {
+        selectedCount--;
+      }
+      item.check ^= 0b010;
+      updateRow(item);
+      updateSelectedCount();
+    });
+    row.children[1].appendChild(check);
+
     tableBody.appendChild(row);
     updateRow(item);
   }
@@ -432,54 +552,52 @@ function addRow(item: sicItem) {
 // Function to render table rows
 function updateTable() {
   const tableBody = document.getElementById('table-body');
+
+  selectedCount = 0;
+
   if(tableBody) {
     tableBody.innerHTML = '';
     for(const item of sicItemsImgList) {
       addRow(item);
     }
   }
+
+  updateSelectedCount();
 }
 
 // Handle ID cell click
 function idClick(item: sicItem) {
-  // for twice click event
-  if(indeterminateCancel) {
-    indeterminateCancel = false;
-    return;
-  }
   // indeterminate select
   if(indeterminateIndex[0] < 0) {
     indeterminateIndex[0] = item.index;
-    item.check |= 2;
+    item.check |= 0b100;
     updateRow(item);
+    updateSelectedCount();
   } else {
     let i = 0;
     if(indeterminateIndex[1] < 0) {
       // indeterminate single cancel
       if(indeterminateIndex[0] === item.index) {
         indeterminateIndex = [-1, -1];
-        item.check &= 1;
-        // for twice click event
-        indeterminateCancel = true;
+        item.check &= 0b011;
         updateRow(item);
+        updateSelectedCount();
       // indeterminate select between start and end
       } else {
-        let select = 0;
+        let state = 0;
         indeterminateIndex[1] = item.index;
         for(i = 0; i < sicItemsImgList.length; i++) {
-          switch(select) {
+          switch(state) {
             case 0:
               if(sicItemsImgList[i].index === indeterminateIndex[0] || sicItemsImgList[i].index === indeterminateIndex[1]) {
-                sicItemsImgList[i].check |= 2;
-                select++;
+                sicItemsImgList[i].check |= 0b100;
+                state++;
               }
               break;
             case 1:
+              sicItemsImgList[i].check |= 0b100;
               if(sicItemsImgList[i].index === indeterminateIndex[0] || sicItemsImgList[i].index === indeterminateIndex[1]) {
-                sicItemsImgList[i].check |= 2;
-                select++;
-              } else {
-                sicItemsImgList[i].check |= 2;
+                state++;
               }
               break;
             case 2:
@@ -490,17 +608,16 @@ function idClick(item: sicItem) {
       }
     } else {
       // add indeterminate select
-      if((item.check & 2) === 0) {
-        item.check |= 2;
+      if((item.check & 0b100) === 0) {
+        item.check |= 0b100;
         updateRow(item);
+        updateSelectedCount();
       // cancel indeterminate select all
       } else {
         indeterminateIndex = [-1, -1];
         for(i = 0; i < sicItemsImgList.length; i++) {
-          sicItemsImgList[i].check &= 1;
+          sicItemsImgList[i].check &= 0b011;
         }
-        // for twice click event
-        indeterminateCancel = true;
         updateTable();
       }
     }
@@ -535,16 +652,19 @@ function headerClick(column: string | null): void {
 
   // compare 3-state checkbox
   const compareChecks = (a: number, b: number, ascending: boolean = true): number => {
-    const priorityOrder = [0b00, 0b01, 0b10, 0b11];
+    const priorityOrder = [0b001, 0b010, 0b100];
   
     const order = ascending ? 1 : -1;
   
-    const checkComparison = (a & 0b01) - (b & 0b01);
+    const checkEnable = (a & 0b001) - (b & 0b001);
+    if(checkEnable !== 0) {
+      return order * checkEnable;
+    }
+    const checkComparison = ((a & 0b010) >> 1) - ((b & 0b010) >> 1);
     if (checkComparison !== 0) {
       return order * checkComparison;
     }
-  
-    const indeterminateComparison = ((a & 0b10) >> 1) - ((b & 0b10) >> 1);
+    const indeterminateComparison = ((a & 0b100) >> 2) - ((b & 0b100) >> 2);
     if (indeterminateComparison !== 0) {
       return order * indeterminateComparison;
     }
@@ -574,3 +694,129 @@ function headerClick(column: string | null): void {
 
   updateTable();
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  // initialize Popper.js for Bootstrap
+  const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+  const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+  console.log(popoverList);  // temp
+  console.log(tooltipList);  // temp
+
+  const btnDownload = <HTMLButtonElement>document.getElementById('btnDownload');
+  const btnCopy = <HTMLButtonElement>document.getElementById('btnCopy');
+  const btnSendToAria2 = <HTMLButtonElement>document.getElementById('btnSendToAria2');
+  const btnClear = <HTMLButtonElement>document.getElementById('btnClear');
+  const txtSearch = <HTMLInputElement>document.getElementById('txtSearch');
+  const rdoBgChecker = <HTMLInputElement>document.getElementById('rdoBgChecker');
+  const rdoBgColor = <HTMLInputElement>document.getElementById('rdoBgColor');
+  const clrBgColor = <HTMLInputElement>document.getElementById('clrBgColor');
+  const btnOptions = <HTMLButtonElement>document.getElementById('btnOptions');
+  const btnToTop = <HTMLButtonElement>document.getElementById('btnToTop');
+  const btnToBottom = <HTMLButtonElement>document.getElementById('btnToBottom');
+
+  btnDownload.addEventListener('click', function () {
+    const proms: Promise<number>[] = [];
+    for(const item of sicItemsImgList) {
+      if((item.check & 0b110) && (item.check & 0b001) && item.tag !== 'SVG') {
+        const options: chrome.downloads.DownloadOptions = {
+          url: item.url
+        }
+        if(sicOptionsImgList.useDownloadDir) {
+          options.saveAs = false;
+        }
+        proms.push(chrome.downloads.download(options));
+      }
+    }
+    Promise.all(proms);
+  });
+  btnCopy.addEventListener('click', function () {
+    let text = '';
+    for(const item of sicItemsImgList) {
+      if((item.check & 0b110) && (item.check & 0b001) && item.tag !== 'SVG') {
+        if(text === '') {
+          text += item.url;
+        } else {
+          text += '\n' + item.url;
+        }
+      }
+    }
+    if(text !== '') {
+      (async () => {
+        navigator.clipboard.writeText(text);
+      })();
+    }
+  });
+  btnSendToAria2.addEventListener('click', function () {
+    const proms: Promise<any>[] = [];
+    for(const item of sicItemsImgList) {
+      if((item.check & 0b110) && (item.check & 0b001) && item.tag !== 'SVG') {
+        proms.push(chrome.runtime.sendMessage('mpkodccbngfoacfalldjimigbofkhgjn', { url: item.url }));
+      }
+    }
+    Promise.all(proms);
+  });
+
+  btnClear.addEventListener('click', function () {
+    for(const item of sicItemsImgList) {
+      item.check &= 0b001;
+    }
+    updateTable();
+  });
+
+  txtSearch.addEventListener('input', function () {
+    searchText = this.value;
+    updateTable();
+  });
+
+  rdoBgChecker.addEventListener('click', function () {
+    sicOptionsImgList.bgChecker = true;
+    if(sicOptionsImgList.rememberBg) {
+      (async () => {
+        await chrome.runtime.sendMessage({
+          action: 'azo_sic_saveoptions',
+          storageoptions: convertOptionsToStorageImgList(sicOptionsImgList)
+        });
+      })();
+    }
+    updateTable();
+  });
+  rdoBgColor.addEventListener('click', function () {
+    sicOptionsImgList.bgChecker = false;
+    if(sicOptionsImgList.rememberBg) {
+      (async () => {
+        await chrome.runtime.sendMessage({
+          action: 'azo_sic_saveoptions',
+          storageoptions: convertOptionsToStorageImgList(sicOptionsImgList)
+        });
+      })();
+    }
+    updateTable();
+  });
+  clrBgColor.addEventListener('change', function () {
+    sicOptionsImgList.bgColor = clrBgColor.value;
+    if(sicOptionsImgList.rememberBg) {
+      (async () => {
+        await chrome.runtime.sendMessage({
+          action: 'azo_sic_saveoptions',
+          storageoptions: convertOptionsToStorageImgList(sicOptionsImgList)
+        });
+      })();
+    }
+    if(!sicOptionsImgList.bgChecker) {
+      updateTable();
+    }
+  });
+
+  btnOptions.addEventListener('click', function () {
+    chrome.runtime.openOptionsPage();
+  });
+
+  btnToTop.addEventListener('click', function () {
+    window.scrollTo(0, 0);
+  });
+  btnToBottom.addEventListener('click', function () {
+    window.scrollTo(0, document.body.scrollHeight);
+  });
+});

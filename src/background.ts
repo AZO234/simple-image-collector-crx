@@ -5,8 +5,10 @@ interface sicOptions {
   rememberSort: boolean;
   sortColmun: string;
   sortOrder: string;
+  rememberBg: boolean;
   bgChecker: boolean;
   bgColor: string;
+  useDownloadDir: boolean;
   remove1x1: boolean;
   rTimeout: number;
 }
@@ -18,8 +20,10 @@ const sicDefOptions: sicOptions = {
   rememberSort: false,
   sortColmun: '',
   sortOrder: '',
+  rememberBg: true,
   bgChecker: true,
   bgColor: '#FFFFFF',
+  useDownloadDir: false,
   remove1x1: true,
   rTimeout: 10000
 };
@@ -32,8 +36,10 @@ interface sicStorageOptions {
   bRememberSort: string;
   txtSortColumn: string;
   txtSortOrder: string;
+  bRememberBg: string;
   bBgChecker: string;
   clrBgColor: string;
+  bUseDownloadDir: string;
   bRemove1x1: string;
   nmbRTimeout: string;
 }
@@ -46,8 +52,10 @@ function convertOptionsToStorage(options: sicOptions): sicStorageOptions {
     bRememberSort: options.rememberSort.toString(),
     txtSortColumn: options.sortColmun,
     txtSortOrder: options.sortOrder,
+    bRememberBg: options.rememberBg.toString(),
     bBgChecker: options.bgChecker.toString(),
     clrBgColor: options.bgColor,
+    bUseDownloadDir: options.useDownloadDir.toString(),
     bRemove1x1: options.remove1x1.toString(),
     nmbRTimeout: options.rTimeout.toString()
   };

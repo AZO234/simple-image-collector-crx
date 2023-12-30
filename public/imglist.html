@@ -8,40 +8,86 @@
 <title>simple-image-collector</title>
 </head>
 <body>
-<h1 id="listtitle" class="text-center">simple-image-collector</h1>
-<table class="table table-bordered m-3 text-center">
-  <thead>
-    <tr class="table-primary">
-      <th scope="col" data-sort="id" class="text-center">ID <i class="bi bi-sort-alpha-down"></i></th>
-      <th scope="col" data-sort="chk" class="text-center">Chk<i class="bi bi-sort-alpha-down"></i></th>
-      <th scope="col" data-sort="tag" class="text-center">Tag<i class="bi bi-sort-alpha-down"></i></th>
-      <th scope="col" data-sort="type" class="text-center">Type<i class="bi bi-sort-alpha-down"></i></th>
-      <th scope="col" data-sort="mime" class="text-center">MIME<i class="bi bi-sort-alpha-down"></i></th>
-      <th scope="col" data-sort="url" class="text-center">URL&Info<i class="bi bi-sort-alpha-down"></i></th>
-    </tr>
-  </thead>
-  <tbody id="table-body" class="text-center">
-  </tbody>
-</table>
+  <!-- nav -->
+  <nav class="navbar navbar-expand-sm sticky-top bg-body-tertiary opacity-75">
+    <div class="container-fluid">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto pt-2 mb-2 mb-lg-0">
+          <li class="nav-item dropdown">
+            <a id="btnAction" href="#" class="nav-link dropdown-toggle btn text-bg-primary" data-bs-toggle="dropdown" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="Action for select item">
+              <i class="bi bi-download"></i> Action
+              <span id="nmbSelectedCount" class="position-absolute top-0 start-100 translate-middle badge text-bg-danger rounded-pill border border-light" style="display: none;"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a id="btnDownload" class="dropdown-item" href="#" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="Download select items"><i class="bi bi-download"></i> Download</a></li>
+              <li><a id="btnCopy" class="dropdown-item" href="#" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="Copy select items URL"><i class="bi bi-copy"></i> Copy</a></li>
+              <li><a id="btnSendToAria2" class="dropdown-item" href="#" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="Send select items to Aria2-Explorer"><i class="bi bi-send"></i> Send to Aria2</a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <span class="d-inline-block ms-4" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="All clear items select">
+              <button id="btnClear" class="btn btn-danger" type="button"><i class="bi bi-slash-square"></i> Clear</button>
+            </span>
+          </li>
+        </ul>
+        <div class="d-flex" role="search">
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input id="txtSearch" class="form-control me-2" type="search" placeholder="Search" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="Search (With // to RegExp)">
+          </div>  
+          <div class="btn-group me-2" role="background" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="Background color of image">
+            <input type="radio" class="btn-check" name="btnradio" id="rdoBgChecker" checked>
+            <label class="btn btn-outline-secondary" for="rdoBgChecker">Checker</label>
+            <input type="radio" class="btn-check" name="btnradio" id="rdoBgColor">
+            <label class="btn btn-outline-secondary" for="rdoBgColor">Color</label>
+          </div>
+          <input type="color" id="clrBgColor" class="me-2">
+          <button id="btnOptions" class="btn btn-secondary me-2" type="button" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="Options"><i class="bi bi-gear-fill"></i></button>
+          <div class="btn-group" role="background">
+            <button id="btnToTop" class="btn btn-secondary" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="Go to page top"><i class="bi bi-file-arrow-up"></i></button>
+            <button id="btnToBottom" class="btn btn-secondary" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="Go to page bottom"><i class="bi bi-file-arrow-down"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
 
-<!-- loading -->
-<div id="loading" class="text-center">
-  <img src="images/loading.gif" alt="loading">
-</div>
+  <h1 id="listtitle" class="text-center">simple-image-collector</h1>
+  <table class="table table-bordered m-3 text-center">
+    <thead>
+      <tr class="table-primary">
+        <th scope="col" data-sort="id" class="text-center">ID <i class="bi bi-sort-alpha-down"></i></th>
+        <th scope="col" data-sort="chk" class="text-center">Chk<i class="bi bi-sort-alpha-down"></i></th>
+        <th scope="col" data-sort="tag" class="text-center">Tag<i class="bi bi-sort-alpha-down"></i></th>
+        <th scope="col" data-sort="type" class="text-center">Type<i class="bi bi-sort-alpha-down"></i></th>
+        <th scope="col" data-sort="mime" class="text-center">MIME<i class="bi bi-sort-alpha-down"></i></th>
+        <th scope="col" data-sort="url" class="text-center">URL&Info<i class="bi bi-sort-alpha-down"></i></th>
+      </tr>
+    </thead>
+    <tbody id="table-body" class="text-center">
+    </tbody>
+  </table>
 
-<!-- modal -->
-<div id="modal" class="modal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-body text-center">
-        <div id="modal-image"></div>
+  <!-- loading -->
+  <div id="loading" class="text-center">
+    <img src="images/loading.gif" alt="loading">
+  </div>
+
+  <!-- modal -->
+  <div id="modal" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-body text-center">
+          <div id="modal-image"></div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<script src="js/bootstrap.bundle.min.js"></script>
-<script src="js/popper.min.js"></script>
-<script type="module" src="imglist.js"></script>
+  <script src="js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="imglist.js"></script>
 </body>
 </html>

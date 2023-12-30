@@ -8,78 +8,60 @@
 <title>simple-image-collector options</title>
 </head>
 <body>
-<h1 id="listtitle" class="text-center"><i class="bi bi-image"></i>simple-image-collector options</h1>
-<div class="row">
-  <div class="col-none col-md-3"></div>
-  <div class="col-12 col-md-6 text-center">
-    <table class="table table-bordered m-3">
-      <tbody>
-        <tr>
-          <td class="bg-primary-subtle">Ext pattern as image (RegExp format)</td>
-          <td><input id="txtImgExtPattern" type="text" class="form-text" size="30" placeholder="e.g. /\.(jpg|jpeg)$/"></input></td>
-        </tr>
-        <tr>
-          <td class="bg-primary-subtle">Get atoimg (out of pages image link)</td>
-          <td><input id="chkGetAToImg" type="checkbox" class="form-check-input"></td>
-        </tr>
-        <tr>
-          <td class="bg-primary-subtle">Thumbnail width</td>
-          <td><input id="nmbThumbWidth" type="number" min="0" placeholder="e.g. 100"></input></td>
-        </tr>
-        <tr>
-          <td class="bg-primary-subtle">Remember sort</td>
-          <td><input id="chkRememberSort" type="checkbox" class="form-check-input"></input></td>
-        </tr>
-        <tr>
-          <td class="bg-primary-subtle">Background of image</td>
-          <td>
-            <div class="row">
-              <div class="col-4">
-                <input id="rdoBIChecker" type="radio" name="frmBgOfImage" class="form-check-input"></input>
-                <label class="form-check-label" for="frmBIChecker">checker</label>
-              </div>
-              <div class="col-4">
-                <input id="rdoBIWhite" type="radio" name="frmBgOfImage" class="form-check-input"></input>
-                <label class="form-check-label" for="frmBIWhite">white</label>
-              </div>
-              <div class="col-4">
-                <input id="rdoBIBlack" type="radio" name="frmBgOfImage" class="form-check-input"></input>
-                <label class="form-check-label" for="frmBIBlack">black</label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-12">
-                <input id="rdoBICustom" type="radio" name="frmBgOfImage" class="form-check-input"></input>
-                <input id="clrBIColor" type="text" placeholder="e.g. #FFFFFF"></input>
-              </div>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td class="bg-primary-subtle">Remove 1x1 image</td>
-          <td><input id="chkRemove1x1" type="checkbox" class="form-check-input"></input></td>
-        </tr>
-        <tr>
-          <td class="bg-primary-subtle">Read timeout</td>
-          <td><input id="nmbRTimeout" type="number" min="500" step="500" placeholder="e.g. 10000"></input></td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="row">
-      <div class="col-3"></div>
-      <div class="col-3">
-        <button class="btn btn-danger" id="btnDefault">Back default</button>
+  <h1 id="listtitle" class="text-center mt-10"><i class="bi bi-image"></i> simple-image-collector options</h1>
+  <div class="row">
+    <div class="col-none col-md-3"></div>
+    <div class="col-12 col-md-6 text-center">
+      <table class="table table-bordered m-3">
+        <tbody>
+          <tr>
+            <td class="bg-primary-subtle">Ext pattern as image (RegExp format)</td>
+            <td><input id="txtImgExtPattern" type="text" class="form-text" size="30" placeholder="e.g. /\.(jpg|jpeg)$/"></input></td>
+          </tr>
+          <tr>
+            <td class="bg-primary-subtle">Get atoimg (out of pages image link)</td>
+            <td><input id="chkGetAToImg" type="checkbox" class="form-check-input"></td>
+          </tr>
+          <tr>
+            <td class="bg-primary-subtle">Thumbnail width</td>
+            <td><input id="nmbThumbWidth" type="number" min="0" placeholder="e.g. 100"></input></td>
+          </tr>
+          <tr>
+            <td class="bg-primary-subtle">Remember sort</td>
+            <td><input id="chkRememberSort" type="checkbox" class="form-check-input"></input></td>
+          </tr>
+          <tr>
+            <td class="bg-primary-subtle">Remember background color of image</td>
+            <td><input id="chkRememberBg" type="checkbox" class="form-check-input"></input></td>
+          </tr>
+          <tr>
+            <td class="bg-primary-subtle">Use download directory</td>
+            <td><input id="chkUseDownloadDir" type="checkbox" class="form-check-input"></input></td>
+          </tr>
+          <tr>
+            <td class="bg-primary-subtle">Remove 1x1 image</td>
+            <td><input id="chkRemove1x1" type="checkbox" class="form-check-input"></input></td>
+          </tr>
+          <tr>
+            <td class="bg-primary-subtle">Read timeout</td>
+            <td><input id="nmbRTimeout" type="number" min="500" step="500" placeholder="e.g. 10000"></input></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="row">
+        <div class="col-3"></div>
+        <div class="col-3">
+          <button class="btn btn-danger" id="btnDefault">Back default</button>
+        </div>
+        <div class="col-3">
+          <button class="btn btn-primary" id="btnSave">Save</button>
+        </div>
+        <div class="col-3"></div>
       </div>
-      <div class="col-3">
-        <button class="btn btn-primary" id="btnSave">Save</button>
-      </div>
-      <div class="col-3"></div>
     </div>
+    <div class="col-none col-md-3"></div>
   </div>
-  <div class="col-none col-md-3"></div>
-</div>
-<script src="js/bootstrap.bundle.min.js"></script>
-<script src="js/popper.min.js"></script>
-<script type="module" src="options.js"></script>
+  <script src="js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="options.js"></script>
 </body>
 </html>

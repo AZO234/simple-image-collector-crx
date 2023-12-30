@@ -5,8 +5,10 @@ const sicDefOptionsOp: sicOptions = {
   rememberSort: false,
   sortColmun: '',
   sortOrder: '',
+  rememberBg: true,
   bgChecker: true,
   bgColor: '#FFFFFF',
+  useDownloadDir: false,
   remove1x1: true,
   rTimeout: 10000
 };
@@ -20,8 +22,10 @@ function convertOptionsToStorageOp(options: sicOptions): sicStorageOptions {
     bRememberSort: options.rememberSort.toString(),
     txtSortColumn: options.sortColmun,
     txtSortOrder: options.sortOrder,
+    bRememberBg: options.rememberBg.toString(),
     bBgChecker: options.bgChecker.toString(),
     clrBgColor: options.bgColor,
+    bUseDownloadDir: options.useDownloadDir.toString(),
     bRemove1x1: options.remove1x1.toString(),
     nmbRTimeout: options.rTimeout.toString()
   };
@@ -35,8 +39,10 @@ function loadOptionsToUI() {
     bRememberSort: '',
     txtSortColumn: '',
     txtSortOrder: '',
+    bRememberBg: '',
     bBgChecker: '',
     clrBgColor: '',
+    bUseDownloadDir: '',
     bRemove1x1: '',
     nmbRTimeout: '',
   }
@@ -48,8 +54,10 @@ function loadOptionsToUI() {
     sicOptionsOp.rememberSort = result['bRememberSort'] === 'true';
     sicOptionsOp.sortColmun = result['txtSortColumn'];
     sicOptionsOp.sortOrder = result['txtSortOrder'];
+    sicOptionsOp.rememberBg = result['bRememberBg'] === 'true';
     sicOptionsOp.bgChecker = result['bBgChecker'] === 'true';
     sicOptionsOp.bgColor = result['clrBgColor'];
+    sicOptionsOp.useDownloadDir = result['bUseDownloadDir'] === 'true';
     sicOptionsOp.remove1x1 = result['bRemove1x1'] === 'true';
     sicOptionsOp.rTimeout = Number(result['nmbRTimeout']);
 
@@ -57,11 +65,8 @@ function loadOptionsToUI() {
     const chkGetAToImg = <HTMLInputElement>document.getElementById('chkGetAToImg');
     const nmbThumbWidth = <HTMLInputElement>document.getElementById('nmbThumbWidth');
     const chkRememberSort = <HTMLInputElement>document.getElementById('chkRememberSort');
-    const rdoBIChecker = <HTMLInputElement>document.getElementById('rdoBIChecker');
-    const rdoBIWhite = <HTMLInputElement>document.getElementById('rdoBIWhite');
-    const rdoBIBlack = <HTMLInputElement>document.getElementById('rdoBIBlack');
-    const rdoBICustom = <HTMLInputElement>document.getElementById('rdoBICustom');
-    const clrBIColor = <HTMLInputElement>document.getElementById('clrBIColor');
+    const chkRememberBg = <HTMLInputElement>document.getElementById('chkRememberBg');
+    const chkUseDownloadDir = <HTMLInputElement>document.getElementById('chkUseDownloadDir');
     const chkRemove1x1 = <HTMLInputElement>document.getElementById('chkRemove1x1');
     const nmbRTimeout = <HTMLInputElement>document.getElementById('nmbRTimeout');
   
@@ -69,16 +74,8 @@ function loadOptionsToUI() {
     chkGetAToImg.checked = sicOptionsOp.getAToImg;
     nmbThumbWidth.value = sicOptionsOp.thumbnailWidth.toString();
     chkRememberSort.checked = sicOptionsOp.rememberSort;
-    if(sicOptionsOp.bgChecker) {
-      rdoBIChecker.checked = true;
-    } else if(/^white$/i.test(sicOptionsOp.bgColor) || /^#(FFF|FFFFFF)$/i.test(sicOptionsOp.bgColor)) {
-      rdoBIWhite.checked = true;
-    } else if(/^black$/i.test(sicOptionsOp.bgColor) || /^#(000|000000)$/.test(sicOptionsOp.bgColor)) {
-      rdoBIBlack.checked = true;
-    } else {
-      rdoBICustom.checked = true;
-    }
-    clrBIColor.value = sicOptionsOp.bgColor;
+    chkRememberBg.checked = sicOptionsOp.rememberBg;
+    chkUseDownloadDir.checked = sicOptionsOp.useDownloadDir;
     chkRemove1x1.checked = sicOptionsOp.remove1x1;
     nmbRTimeout.value = sicOptionsOp.rTimeout.toString();
   });
@@ -89,22 +86,32 @@ function saveOptionsFromUI() {
   const chkGetAToImg = <HTMLInputElement>document.getElementById('chkGetAToImg');
   const nmbThumbWidth = <HTMLInputElement>document.getElementById('nmbThumbWidth');
   const chkRememberSort = <HTMLInputElement>document.getElementById('chkRememberSort');
-  const rdoBIChecker = <HTMLInputElement>document.getElementById('rdoBIChecker');
-  const rdoBIWhite = <HTMLInputElement>document.getElementById('rdoBIWhite');
-  const rdoBIBlack = <HTMLInputElement>document.getElementById('rdoBIBlack');
-  const rdoBICustom = <HTMLInputElement>document.getElementById('rdoBICustom');
-  const clrBIColor = <HTMLInputElement>document.getElementById('clrBIColor');
+  const chkRememberBg = <HTMLInputElement>document.getElementById('chkRememberBg');
+  const chkUseDownloadDir = <HTMLInputElement>document.getElementById('chkUseDownloadDir');
   const chkRemove1x1 = <HTMLInputElement>document.getElementById('chkRemove1x1');
   const nmbRTimeout = <HTMLInputElement>document.getElementById('nmbRTimeout');
 
   // Ext pattern as image
-  let rxImgExtPattern = Object.assign(sicDefOptionsOp.imgExtPattern);
-  try {
-    if(txtImgExtPattern.value) {
-      rxImgExtPattern = new RegExp(txtImgExtPattern.value);
-    }
-  } catch(e) {
-    rxImgExtPattern = Object.assign(sicDefOptionsOp.imgExtPattern);
+  const m = txtImgExtPattern.value.match(/^\/(.*)\/(.*)$/) || [];
+  let rxImgExtPattern = null;
+  switch(m.length) {
+    case 3:
+      try {
+        rxImgExtPattern = new RegExp(m[1], m[2]);
+      } catch(e) {
+        rxImgExtPattern = Object.assign(sicDefOptionsOp.imgExtPattern);
+      }
+      break;
+    case 2:
+      try {
+        rxImgExtPattern = new RegExp(m[1]);
+      } catch(e) {
+        rxImgExtPattern = Object.assign(sicDefOptionsOp.imgExtPattern);
+      }
+      break;
+    default:
+      rxImgExtPattern = Object.assign(sicDefOptionsOp.imgExtPattern);
+      break;
   }
   sicOptionsOp.imgExtPattern = rxImgExtPattern;
 
@@ -121,18 +128,11 @@ function saveOptionsFromUI() {
     sicOptionsOp.sortOrder = '';
   }
 
-  // Background of image
-  sicOptionsOp.bgChecker = rdoBIChecker.checked;
-  let bgColor = '#FFFFFF';
-  if(clrBIColor.value) {
-    bgColor = clrBIColor.value;
-  }
-  if(rdoBIWhite.checked) {
-    bgColor = '#FFFFFF';
-  } else if(rdoBIBlack.checked) {
-    bgColor = '#000000';
-  }
-  sicOptionsOp.bgColor = bgColor;
+  // Remember background color of image
+  sicOptionsOp.rememberBg = chkRememberBg.checked;
+
+  // Use download directory
+  sicOptionsOp.useDownloadDir = chkUseDownloadDir.checked;
 
   // Remove 1x1 image
   sicOptionsOp.remove1x1 = chkRemove1x1.checked;
