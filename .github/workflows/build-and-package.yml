@@ -1,0 +1,31 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-and-package:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Build
+      run: npm run build
+
+    - name: Set up file name
+      id: file_name
+      run: echo "::set-output name=FILE_NAME::${GITHUB_REPOSITORY#*/}-v${GITHUB_REF#refs/tags/}"
+
+    - name: Zip dist directory
+      run: zip -r ${{ steps.file_name.outputs.FILE_NAME }}.zip dist/
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: dist
+        path: ${{ steps.file_name.outputs.FILE_NAME }}.zip
