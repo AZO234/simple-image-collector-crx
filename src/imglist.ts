@@ -5,6 +5,7 @@ const sicDefOptionsImgList: sicOptions = {
   rememberSort: false,
   sortColmun: '',
   sortOrder: '',
+  oosDisplay: false,
   rememberBg: true,
   bgChecker: true,
   bgColor: '#FFFFFF',
@@ -22,6 +23,7 @@ function convertOptionsToStorageImgList(options: sicOptions): sicStorageOptions 
     bRememberSort: options.rememberSort.toString(),
     txtSortColumn: options.sortColmun,
     txtSortOrder: options.sortOrder,
+    bOosDisplay: options.oosDisplay.toString(),
     bRememberBg: options.rememberSort.toString(),
     bBgChecker: options.bgChecker.toString(),
     clrBgColor: options.bgColor,
@@ -40,6 +42,7 @@ function loadOptionsImgList(message: any) {
     sicOptionsImgList.rememberSort = result['bRememberSort'] === 'true';
     sicOptionsImgList.sortColmun = result['txtSortColumn'];
     sicOptionsImgList.sortOrder = result['txtSortOrder'];
+    sicOptionsImgList.oosDisplay = result['bOosDisplay'] === 'true';
     sicOptionsImgList.bgChecker = result['bBgChecker'] === 'true';
     sicOptionsImgList.bgColor = result['clrBgColor'];
     sicOptionsImgList.useDownloadDir = result['bUseDownloadDir'] === 'true';
@@ -341,6 +344,7 @@ function updateRow(item: sicItem) {
   const check = <HTMLInputElement>cols[1].children[0];
   check.indeterminate = false;
   check.checked = false;
+  row.style.display = '';
   row.classList.remove('table-secondary', 'table-danger', 'table-warning');
   if(item.check & 0b100) {
     row.classList.remove('table-secondary', 'table-danger', 'table-warning');
@@ -356,6 +360,9 @@ function updateRow(item: sicItem) {
   if(!(item.check & 0b001)) {
     row.classList.remove('table-secondary', 'table-danger', 'table-warning');
     row.classList.add('table-secondary');
+    if(!sicOptionsImgList.oosDisplay) {
+      row.style.display = 'none';
+    }
   }
   if((item.check & 0b110) && (item.check & 0b001)) {
     selectedCount++;
@@ -394,7 +401,7 @@ function updateRow(item: sicItem) {
         item.image.data = item.image.data.replace(/height\s*=\s*['"]?\d+['"]?/i, '');
         cols[5].innerHTML = `
         <div class="row">
-          <div class="col-3 col-md-6 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="" data-img-data="${encodeURI(item.image.data)}" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
+          <div class="col-3 col-md-6 img-thumbnail ms-2" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="" data-img-data="${encodeURI(item.image.data)}" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
             ${item.image.data}
           </div>  
           <div class="col-9 col-md-6 text-start">
@@ -406,7 +413,7 @@ function updateRow(item: sicItem) {
       } else {
         cols[5].innerHTML = `
         <div class="row">
-          <div class="col-3 col-md-6 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="${item.image.url}" data-img-data="" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
+          <div class="col-3 col-md-6 img-thumbnail ms-2" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="${item.image.url}" data-img-data="" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
             <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}" alt="thumbnail">
           </div>  
           <div class="col-9 col-md-6 text-start">
@@ -447,7 +454,7 @@ function updateRow(item: sicItem) {
         item.image.data = item.image.data.replace(/height\s*=\s*['"]?\d+['"]?/i, '');
         cols[5].innerHTML = `
         <div class="row">
-          <div class="col-3 col-md-6 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="" data-img-data="${encodeURI(item.image.data)}" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
+          <div class="col-3 col-md-6 img-thumbnail ms-2" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="" data-img-data="${encodeURI(item.image.data)}" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
             ${item.image.data}
           </div>  
           <div class="col-9 col-md-6 text-start">
@@ -457,7 +464,7 @@ function updateRow(item: sicItem) {
       } else {
         cols[5].innerHTML = `
         <div class="row">
-          <div class="col-3 col-md-6 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="${item.image.url}" data-img-data="" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
+          <div class="col-3 col-md-6 img-thumbnail ms-2" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="${item.image.url}" data-img-data="" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
             <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}" alt="thumbnail">
           </div>
           <div class="col-9 col-md-6 text-start">
@@ -590,14 +597,19 @@ function idClick(item: sicItem) {
           switch(state) {
             case 0:
               if(sicItemsImgList[i].index === indeterminateIndex[0] || sicItemsImgList[i].index === indeterminateIndex[1]) {
-                sicItemsImgList[i].check |= 0b100;
-                state++;
+                if(sicOptionsImgList.oosDisplay || (sicItemsImgList[i].check & 0b001)) {
+                  sicItemsImgList[i].check |= 0b100;
+                  state++;
+                }
               }
               break;
             case 1:
               sicItemsImgList[i].check |= 0b100;
               if(sicItemsImgList[i].index === indeterminateIndex[0] || sicItemsImgList[i].index === indeterminateIndex[1]) {
-                state++;
+                if(sicOptionsImgList.oosDisplay || (sicItemsImgList[i].check & 0b001)) {
+                  sicItemsImgList[i].check |= 0b100;
+                  state++;
+                }
               }
               break;
             case 2:
@@ -609,7 +621,9 @@ function idClick(item: sicItem) {
     } else {
       // add indeterminate select
       if((item.check & 0b100) === 0) {
-        item.check |= 0b100;
+        if(!(sicItemsImgList[i].check & 0b001)) {
+          item.check |= 0b100;
+        }
         updateRow(item);
         updateSelectedCount();
       // cancel indeterminate select all
@@ -730,6 +744,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
     Promise.all(proms);
+
+    indeterminateIndex = [-1, -1];
+    for(let i = 0; i < sicItemsImgList.length; i++) {
+      sicItemsImgList[i].check &= 0b011;
+    }
   });
   btnCopy.addEventListener('click', function () {
     let text = '';
@@ -756,6 +775,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
     Promise.all(proms);
+
+    indeterminateIndex = [-1, -1];
+    for(let i = 0; i < sicItemsImgList.length; i++) {
+      sicItemsImgList[i].check &= 0b011;
+    }
   });
 
   btnClear.addEventListener('click', function () {

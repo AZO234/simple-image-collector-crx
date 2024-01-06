@@ -5,6 +5,7 @@ const sicDefOptionsOp: sicOptions = {
   rememberSort: false,
   sortColmun: '',
   sortOrder: '',
+  oosDisplay: false,
   rememberBg: true,
   bgChecker: true,
   bgColor: '#FFFFFF',
@@ -22,6 +23,7 @@ function convertOptionsToStorageOp(options: sicOptions): sicStorageOptions {
     bRememberSort: options.rememberSort.toString(),
     txtSortColumn: options.sortColmun,
     txtSortOrder: options.sortOrder,
+    bOosDisplay: options.oosDisplay.toString(),
     bRememberBg: options.rememberBg.toString(),
     bBgChecker: options.bgChecker.toString(),
     clrBgColor: options.bgColor,
@@ -39,6 +41,7 @@ function loadOptionsToUI() {
     bRememberSort: '',
     txtSortColumn: '',
     txtSortOrder: '',
+    bOosDisplay: '',
     bRememberBg: '',
     bBgChecker: '',
     clrBgColor: '',
@@ -54,6 +57,7 @@ function loadOptionsToUI() {
     sicOptionsOp.rememberSort = result['bRememberSort'] === 'true';
     sicOptionsOp.sortColmun = result['txtSortColumn'];
     sicOptionsOp.sortOrder = result['txtSortOrder'];
+    sicOptionsOp.oosDisplay = result['bOosDisplay'] === 'true';
     sicOptionsOp.rememberBg = result['bRememberBg'] === 'true';
     sicOptionsOp.bgChecker = result['bBgChecker'] === 'true';
     sicOptionsOp.bgColor = result['clrBgColor'];
@@ -64,6 +68,7 @@ function loadOptionsToUI() {
     const txtImgExtPattern = <HTMLInputElement>document.getElementById('txtImgExtPattern');
     const chkGetAToImg = <HTMLInputElement>document.getElementById('chkGetAToImg');
     const nmbThumbWidth = <HTMLInputElement>document.getElementById('nmbThumbWidth');
+    const chkOosDisplay = <HTMLInputElement>document.getElementById('chkOosDisplay');
     const chkRememberSort = <HTMLInputElement>document.getElementById('chkRememberSort');
     const chkRememberBg = <HTMLInputElement>document.getElementById('chkRememberBg');
     const chkUseDownloadDir = <HTMLInputElement>document.getElementById('chkUseDownloadDir');
@@ -73,6 +78,7 @@ function loadOptionsToUI() {
     txtImgExtPattern.value = sicOptionsOp.imgExtPattern.source;
     chkGetAToImg.checked = sicOptionsOp.getAToImg;
     nmbThumbWidth.value = sicOptionsOp.thumbnailWidth.toString();
+    chkOosDisplay.checked = sicOptionsOp.oosDisplay;
     chkRememberSort.checked = sicOptionsOp.rememberSort;
     chkRememberBg.checked = sicOptionsOp.rememberBg;
     chkUseDownloadDir.checked = sicOptionsOp.useDownloadDir;
@@ -85,6 +91,7 @@ function saveOptionsFromUI() {
   const txtImgExtPattern = <HTMLInputElement>document.getElementById('txtImgExtPattern');
   const chkGetAToImg = <HTMLInputElement>document.getElementById('chkGetAToImg');
   const nmbThumbWidth = <HTMLInputElement>document.getElementById('nmbThumbWidth');
+  const chkOosDisplay = <HTMLInputElement>document.getElementById('chkOosDisplay');
   const chkRememberSort = <HTMLInputElement>document.getElementById('chkRememberSort');
   const chkRememberBg = <HTMLInputElement>document.getElementById('chkRememberBg');
   const chkUseDownloadDir = <HTMLInputElement>document.getElementById('chkUseDownloadDir');
@@ -120,6 +127,9 @@ function saveOptionsFromUI() {
 
   // Thumbnail width
   sicOptionsOp.thumbnailWidth = Number(nmbThumbWidth.value);
+
+  // Out of search display
+  sicOptionsOp.oosDisplay = chkOosDisplay.checked;
 
   // Remember sort
   sicOptionsOp.rememberSort = chkRememberSort.checked;

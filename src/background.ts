@@ -5,6 +5,7 @@ interface sicOptions {
   rememberSort: boolean;
   sortColmun: string;
   sortOrder: string;
+  oosDisplay: boolean;
   rememberBg: boolean;
   bgChecker: boolean;
   bgColor: string;
@@ -20,6 +21,7 @@ const sicDefOptions: sicOptions = {
   rememberSort: false,
   sortColmun: '',
   sortOrder: '',
+  oosDisplay: false,
   rememberBg: true,
   bgChecker: true,
   bgColor: '#FFFFFF',
@@ -36,6 +38,7 @@ interface sicStorageOptions {
   bRememberSort: string;
   txtSortColumn: string;
   txtSortOrder: string;
+  bOosDisplay: string;
   bRememberBg: string;
   bBgChecker: string;
   clrBgColor: string;
@@ -52,6 +55,7 @@ function convertOptionsToStorage(options: sicOptions): sicStorageOptions {
     bRememberSort: options.rememberSort.toString(),
     txtSortColumn: options.sortColmun,
     txtSortOrder: options.sortOrder,
+    bOosDisplay: options.rememberSort.toString(),
     bRememberBg: options.rememberBg.toString(),
     bBgChecker: options.bgChecker.toString(),
     clrBgColor: options.bgColor,

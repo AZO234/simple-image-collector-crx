@@ -36,7 +36,13 @@
         <div class="d-flex" role="search">
           <div class="input-group">
             <span class="input-group-text"><i class="bi bi-search"></i></span>
-            <input id="txtSearch" class="form-control me-2" type="search" placeholder="Search" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="Search (With // to RegExp)">
+            <input id="txtSearch" class="form-control me-2" type="search" placeholder="Search" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="Search (With // to RegExp)" autocomplete="on" list="searchlist">
+            <datalist id="searchlist">
+              <option value="atoimg"></option>
+              <option value="jpg"></option>
+              <option value="png"></option>
+              <option value="svg"></option>
+            </datalist>
           </div>  
           <div class="btn-group me-2" role="background" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="Background color of image">
             <input type="radio" class="btn-check" name="btnradio" id="rdoBgChecker" checked>
@@ -78,7 +84,7 @@
 
   <!-- modal -->
   <div id="modal" class="modal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-body text-center">
           <div id="modal-image"></div>

@@ -1,6 +1,6 @@
 {
   "name": "simple-image-collector",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simple image collector.",
   "scripts": {
     "build": "rm -rf dist && cp -r public dist && cp manifest.json dist/ && mkdir dist/js && cp node_modules/bootstrap/dist/js/bootstrap.bundle.min.js dist/js/ && mkdir dist/css && cp node_modules/bootstrap/dist/css/bootstrap.min.css dist/css/ && mkdir -p dist/font/fonts && cp node_modules/bootstrap-icons/font/bootstrap-icons.min.css dist/font/ && cp node_modules/bootstrap-icons/font/fonts/*.woff* dist/font/fonts/ && tsc"
