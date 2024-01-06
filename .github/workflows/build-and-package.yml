@@ -1,11 +1,11 @@
-name: Release Build
+name: Release Build and Upload
 
 on:
   release:
     types: [created]
 
 jobs:
-  build-and-package:
+  build-and-upload:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,14 +17,15 @@ jobs:
     - name: Build
       run: npm run build
 
-    - name: Set up file name
-      id: file_name
-      run: echo "::set-output name=FILE_NAME::${GITHUB_REPOSITORY#*/}-v${GITHUB_REF#refs/tags/}"
-
     - name: Zip dist directory
-      run: zip -r ${{ steps.file_name.outputs.FILE_NAME }}.zip dist/
+      run: zip -r "${{ github.repository }}_v${{ github.ref_name }}.zip" dist/
 
-    - uses: actions/upload-artifact@v2
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: dist
-        path: ${{ steps.file_name.outputs.FILE_NAME }}.zip
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: "./${{ github.repository }}_v${{ github.ref_name }}.zip"
+        asset_name: "${{ github.repository }}_v${{ github.ref_name }}.zip"
+        asset_content_type: application/zip
