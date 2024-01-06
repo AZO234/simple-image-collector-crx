@@ -22,8 +22,8 @@ jobs:
     - name: Build
       run: npm run build
 
-    - name: Get repository name (without owner)
-    - run: echo "${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}" >> $GITHUB_ENV
+    - name: Get repository name without owner
+      run: echo "${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}" >> $GITHUB_ENV
 
     - name: Zip dist directory
       run: zip -r "${{ env.REPOSITORY_NAME }}_v${{ github.ref_name }}.zip" dist/
