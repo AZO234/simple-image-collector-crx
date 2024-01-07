@@ -1,0 +1,46 @@
+name: Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install Dependencies
+      - run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Zip dist directory
+        run: zip -r "${{ env.REPOSITORY_NAME }}_v${{ github.ref_name }}.zip" dist/
+
+      - name: Submit to Chrome webstore
+        run: npx chrome-webstore-upload-cli@3 upload --source extension.zip --auto-publish
+        env:
+          EXTENSION_ID: ${{ secrets.EXTENSION_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: "./${{ env.REPOSITORY_NAME }}_v${{ github.ref_name }}.zip"
+          asset_name: "${{ env.REPOSITORY_NAME }}_v${{ github.ref_name }}.zip"
+          asset_content_type: application/zip
+

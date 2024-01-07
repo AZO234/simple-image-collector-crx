@@ -117,7 +117,7 @@ async function collectItems(): Promise<number> {
 
   function isUniqueSVGItem(tag: Element): boolean {
     for(const item of sicWorkItems) {
-      if(item.tag.tag === tag) {
+      if(item.tag.tag.outerHTML === tag.outerHTML) {
         return false;
       }
     }

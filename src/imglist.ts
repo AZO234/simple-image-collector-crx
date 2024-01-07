@@ -270,71 +270,6 @@ function updateRow(item: sicItem) {
   const row = <HTMLTableRowElement>document.getElementById('row_' + item.index);
   const cols = row.children;
 
-  // search
-  let bFound = true;
-  item.check |= 0b001;
-  if(searchText !== '') {
-    bFound = false;
-
-    // RegExp
-    if(/^\/.*\//.test(searchText)) {
-      const m = searchText.match(/^\/(.*)\/(.*?)$/) || [];
-      let re = null;
-      switch(m.length) {
-        case 3:
-          try {
-            re = new RegExp(m[1], m[2]);
-          } catch(e) {
-            re = new RegExp('');
-          }
-          break;
-        case 2:  
-          try {
-            re = new RegExp(m[1]);
-          } catch(e) {
-            re = new RegExp('');
-          }
-          break;
-        default:  
-          re = new RegExp('');
-      }
-      if(
-        re.test(item.tag) ||
-        re.test(item.type) ||
-        re.test(item.url)
-      ) {
-        bFound = true;
-      }
-      if(item.image && (
-        re.test(item.image.type) ||
-        re.test(item.image.mime) ||
-        re.test(item.image.url) ||
-        re.test(item.image.data)
-      )) {
-        bFound = true;
-      }
-    } else {
-      if(
-        item.tag.includes(searchText) ||
-        item.type.includes(searchText) ||
-        item.url.includes(searchText)
-      ) {
-        bFound = true;
-      }
-      if(item.image && (
-        item.image.type.includes(searchText) ||
-        item.image.mime.includes(searchText) ||
-        item.image.url.includes(searchText) ||
-        item.image.data.includes(searchText)
-      )) {
-        bFound = true;
-      }
-    }
-    if(!bFound) {
-      item.check &= 0b110;
-    }
-  }
-
   // column: ID
   const col = <HTMLTableCellElement>cols[0];
   col.classList.add('text-end');
@@ -400,46 +335,52 @@ function updateRow(item: sicItem) {
         }
         item.image.data = item.image.data.replace(/height\s*=\s*['"]?\d+['"]?/i, '');
         cols[5].innerHTML = `
-        <div class="row">
-          <div class="col-3 col-md-6 img-thumbnail ms-2" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="" data-img-data="${encodeURI(item.image.data)}" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
-            ${item.image.data}
-          </div>  
-          <div class="col-9 col-md-6 text-start">
-            ${item.iframeIndex ? '<br>iframe: ' + item.iframeIndex : ''}
-            ${item.iframeDepth ? '<br>depth: ' + item.iframeDepth : ''}
-            ${item.image.inCSS ? '<br>in CSS' : ''}
+        <div class="container-fluid ms-2">
+          <div class="row">
+            <div class="col-6 col-lg-3 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="" data-img-data="${encodeURI(item.image.data)}" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
+              ${item.image.data}
+            </div>  
+            <div class="col-6 col-lg-9 text-start">
+              ${item.iframeIndex ? '<br>iframe: ' + item.iframeIndex : ''}
+              ${item.iframeDepth ? '<br>depth: ' + item.iframeDepth : ''}
+              ${item.image.inCSS ? '<br>in CSS' : ''}
+            </div>
           </div>
         </div>`;
       } else {
         cols[5].innerHTML = `
+        <div class="container-fluid ms-2">
+          <div class="row">
+            <div class="col-6 col-lg-3 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="${item.image.url}" data-img-data="" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
+              <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}" alt="thumbnail">
+            </div>  
+            <div class="col-6 col-lg-9 text-start">
+              ${item.image.width}x${item.image.height}
+              ${item.iframeIndex ? '<br>iframe: ' + item.iframeIndex : ''}
+              ${item.iframeDepth ? '<br>depth: ' + item.iframeDepth : ''}
+              ${item.image.inCSS ? '<br>in CSS' : ''}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12 text-start">
+              <a class="link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="${item.url}" target="_blank">${displayURL}</a>
+            </div>
+          </div>
+        </div>`;
+      }
+    } else {
+      cols[5].innerHTML = `
+      <div class="container-fluid ms-2">
         <div class="row">
-          <div class="col-3 col-md-6 img-thumbnail ms-2" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="${item.image.url}" data-img-data="" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
-            <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}" alt="thumbnail">
-          </div>  
-          <div class="col-9 col-md-6 text-start">
-            ${item.image.width}x${item.image.height}
+          <div class="col-12 text-start">
             ${item.iframeIndex ? '<br>iframe: ' + item.iframeIndex : ''}
             ${item.iframeDepth ? '<br>depth: ' + item.iframeDepth : ''}
-            ${item.image.inCSS ? '<br>in CSS' : ''}
           </div>
         </div>
         <div class="row">
           <div class="col-12 text-start">
             <a class="link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="${item.url}" target="_blank">${displayURL}</a>
           </div>
-        </div>`;
-      }
-    } else {
-      cols[5].innerHTML = `
-      <div class="row">
-        <div class="col-12 text-start">
-          ${item.iframeIndex ? '<br>iframe: ' + item.iframeIndex : ''}
-          ${item.iframeDepth ? '<br>depth: ' + item.iframeDepth : ''}
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-12 text-start">
-          <a class="link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="${item.url}" target="_blank">${displayURL}</a>
         </div>
       </div>`;
     }
@@ -453,28 +394,32 @@ function updateRow(item: sicItem) {
         }
         item.image.data = item.image.data.replace(/height\s*=\s*['"]?\d+['"]?/i, '');
         cols[5].innerHTML = `
-        <div class="row">
-          <div class="col-3 col-md-6 img-thumbnail ms-2" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="" data-img-data="${encodeURI(item.image.data)}" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
-            ${item.image.data}
-          </div>  
-          <div class="col-9 col-md-6 text-start">
-            ${item.image.inCSS ? '<br>in CSS' : ''}
+        <div class="container-fluid ms-2">
+          <div class="row">
+            <div class="col-6 col-lg-3 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="" data-img-data="${encodeURI(item.image.data)}" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
+              ${item.image.data}
+            </div>  
+            <div class="col-6 col-lg-9 text-start">
+              ${item.image.inCSS ? '<br>in CSS' : ''}
+            </div>
           </div>
         </div>`;
       } else {
         cols[5].innerHTML = `
-        <div class="row">
-          <div class="col-3 col-md-6 img-thumbnail ms-2" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="${item.image.url}" data-img-data="" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
-            <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}" alt="thumbnail">
+        <div class="container-fluid ms-2">
+          <div class="row">
+            <div class="col-6 col-lg-3 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="${item.image.url}" data-img-data="" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
+              <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}" alt="thumbnail">
+            </div>
+            <div class="col-6 col-lg-9 text-start">
+              ${item.image.width}x${item.image.height}
+              ${item.image.inCSS ? '<br>in CSS' : ''}
+            </div>
           </div>
-          <div class="col-9 col-md-6 text-start">
-            ${item.image.width}x${item.image.height}
-            ${item.image.inCSS ? '<br>in CSS' : ''}
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-12 text-start">
-            <a class="link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="${item.url}" target="_blank">${displayURL}</a>
+          <div class="row">
+            <div class="col-12 text-start">
+              <a class="link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="${item.url}" target="_blank">${displayURL}</a>
+            </div>
           </div>
         </div>`;
       }
@@ -551,8 +496,75 @@ function addRow(item: sicItem) {
     });
     row.children[1].appendChild(check);
 
-    tableBody.appendChild(row);
-    updateRow(item);
+    // search
+    let bFound = true;
+    item.check |= 0b001;
+    if(searchText !== '') {
+      bFound = false;
+
+      // RegExp
+      if(/^\/.*\//.test(searchText)) {
+        const m = searchText.match(/^\/(.*)\/(.*?)$/) || [];
+        let re = null;
+        switch(m.length) {
+          case 3:
+            try {
+              re = new RegExp(m[1], m[2]);
+            } catch(e) {
+              re = new RegExp('');
+            }
+            break;
+          case 2:  
+            try {
+              re = new RegExp(m[1]);
+            } catch(e) {
+              re = new RegExp('');
+            }
+            break;
+          default:  
+            re = new RegExp('');
+        }
+        if(
+          re.test(item.tag) ||
+          re.test(item.type) ||
+          re.test(item.url)
+        ) {
+          bFound = true;
+        }
+        if(item.image && (
+          re.test(item.image.type) ||
+          re.test(item.image.mime) ||
+          re.test(item.image.url) ||
+          re.test(item.image.data)
+        )) {
+          bFound = true;
+        }
+      } else {
+        if(
+          item.tag.includes(searchText) ||
+          item.type.includes(searchText) ||
+          item.url.includes(searchText)
+        ) {
+          bFound = true;
+        }
+        if(item.image && (
+          item.image.type.includes(searchText) ||
+          item.image.mime.includes(searchText) ||
+          item.image.url.includes(searchText) ||
+          item.image.data.includes(searchText)
+        )) {
+          bFound = true;
+        }
+      }
+      if(!bFound) {
+        item.check &= 0b110;
+      }
+    }
+
+    if(bFound || sicOptionsImgList.oosDisplay) {
+      tableBody.appendChild(row);
+      updateRow(item);
+    }
   }
 }
 
