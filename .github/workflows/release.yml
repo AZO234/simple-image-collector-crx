@@ -27,7 +27,7 @@ jobs:
         run: zip -r "${{ env.REPOSITORY_NAME }}_v${{ github.ref_name }}.zip" dist/
 
       - name: Submit to Chrome webstore
-        run: npx chrome-webstore-upload-cli@3 upload --source extension.zip --auto-publish
+        run: npx chrome-webstore-upload-cli@3 upload --source "${{ env.REPOSITORY_NAME }}_v${{ github.ref_name }}.zip" --auto-publish
         env:
           EXTENSION_ID: ${{ secrets.EXTENSION_ID }}
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
