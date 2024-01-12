@@ -2,6 +2,9 @@ const sicDefOptionsImgList: sicOptions = {
   imgExtPattern: new RegExp(/\.(jpg|jpeg|png|svg|gif|webp|heic|heif|avif|tif|tiff|bmp|ico|psd|raw)(\?.*)*$/i),
   getAToImg: false,
   thumbnailWidth: 128,
+  defSearchWord: '',
+  swHistory: [],
+  dlFilenameType: 0,
   rememberSort: false,
   sortColmun: '',
   sortOrder: '',
@@ -20,6 +23,9 @@ function convertOptionsToStorageImgList(options: sicOptions): sicStorageOptions 
     rxImgExtPattern: options.imgExtPattern.source,
     bGetAToImg: options.getAToImg.toString(),
     nmbThumbWidth: options.thumbnailWidth.toString(),
+    txtDefSearchWord: options.defSearchWord,
+    arySwHistory: options.swHistory.map(element => element.replace(/,/g, ',,')).join(','),
+    numDlFilenameType: options.dlFilenameType.toString(),
     bRememberSort: options.rememberSort.toString(),
     txtSortColumn: options.sortColmun,
     txtSortOrder: options.sortOrder,
@@ -39,6 +45,9 @@ function loadOptionsImgList(message: any) {
     sicOptionsImgList.imgExtPattern = new RegExp(result['rxImgExtPattern']);
     sicOptionsImgList.getAToImg = result['bGetAToImg'] === 'true';
     sicOptionsImgList.thumbnailWidth = Number(result['nmbThumbWidth']);
+    sicOptionsImgList.defSearchWord = result['txtDefSearchWord'];
+    sicOptionsImgList.swHistory = result['arySwHistory'].replace(/,,/g, ',').split(',');
+    sicOptionsImgList.dlFilenameType = Number(result['numDlFilenameType']);
     sicOptionsImgList.rememberSort = result['bRememberSort'] === 'true';
     sicOptionsImgList.sortColmun = result['txtSortColumn'];
     sicOptionsImgList.sortOrder = result['txtSortOrder'];
@@ -58,6 +67,9 @@ const sicItemsImgList: sicItem[] = [];
 let searchText = '';
 
 let selectedCount = 0;
+
+let pagetitle = '';
+let pageurl = '';
 
 // Index of the row where indeterminate selection
 let indeterminateIndex = [-1, -1];
@@ -167,6 +179,17 @@ chrome.runtime.onMessage.addListener((message) => {
 });
 
 async function start(title: string, url: string, sicWorkItems: sicItem[]) {
+  // Search word and history
+  const txtSearch = <HTMLInputElement>document.getElementById('txtSearch');
+  txtSearch.value = sicOptionsImgList.defSearchWord;
+  searchText = sicOptionsImgList.defSearchWord;
+  const history = <HTMLDataListElement>document.getElementById('history');
+  for(let i = sicOptionsImgList.swHistory.length - 1; i > -1; i--) {
+    const item = <HTMLOptionElement>document.createElement('option');
+    item.value = sicOptionsImgList.swHistory[i];
+    history.appendChild(item);
+  }
+
   // Background color of image
   const rdoBgChecker = <HTMLInputElement>document.getElementById('rdoBgChecker');
   const rdoBgColor = <HTMLInputElement>document.getElementById('rdoBgColor');
@@ -181,6 +204,9 @@ async function start(title: string, url: string, sicWorkItems: sicItem[]) {
     rdoBgChecker.checked = true;
   }
   clrBgColor.value = sicOptionsImgList.bgColor;
+
+  pagetitle = title;
+  pageurl = url;
 
   // title
   document.title = 'sic:' + title;
@@ -721,14 +747,23 @@ function headerClick(column: string | null): void {
   updateTable();
 }
 
+function getDLDatatime(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = (now.getMonth() + 1).toString().padStart(2, '0');
+  const day = now.getDate().toString().padStart(2, '0');
+  const hours = now.getHours().toString().padStart(2, '0');
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  const seconds = now.getSeconds().toString().padStart(2, '0');
+  return `${year}${month}${day}-${hours}${minutes}${seconds}`;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // initialize Popper.js for Bootstrap
   const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-  const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+  [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-  console.log(popoverList);  // temp
-  console.log(tooltipList);  // temp
+  [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
   const btnDownload = <HTMLButtonElement>document.getElementById('btnDownload');
   const btnCopy = <HTMLButtonElement>document.getElementById('btnCopy');
@@ -742,26 +777,81 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnToTop = <HTMLButtonElement>document.getElementById('btnToTop');
   const btnToBottom = <HTMLButtonElement>document.getElementById('btnToBottom');
 
-  btnDownload.addEventListener('click', function () {
-    const proms: Promise<number>[] = [];
-    for(const item of sicItemsImgList) {
-      if((item.check & 0b110) && (item.check & 0b001) && item.tag !== 'SVG') {
-        const options: chrome.downloads.DownloadOptions = {
-          url: item.url
+  function getDLFilename(datetime: string, item: sicItem): string {
+    let dlpath = '';
+  
+    if(item.image) {
+      const filename = (item.image.url.match(/\/([^\/\?#&]+)(?:\?|#|&|$)/) || [])[1] || '';
+      if(filename === '') {
+        return '';
+      }
+      let ext = (filename.match(/\.([^.]*?)$/) || [])[1] || '';
+      if(ext === '') {
+        if(item.image.mime !== '') {
+          ext = (item.image.mime.match(/\/(.*?)$/) || [])[1] || '';
         }
-        if(sicOptionsImgList.useDownloadDir) {
-          options.saveAs = false;
-        }
-        proms.push(chrome.downloads.download(options));
+      }
+      const pp = decodeURIComponent((pageurl.match(/\/([^\/\?]+)(\/|\?[^\/\?]*?|\/\?[^\/\?]*?)?$/) || [])[1] || '');
+      const pu = pageurl.replace(/:\/\//, '_').replace(/[<>:"\\|?*\x00-\x1F]/g, '_');
+      const pt = pagetitle.replace(/[<>:"\/\\|?*\x00-\x1F]/g, '_');
+  
+      dlpath = filename;
+      switch(sicOptionsImgList.dlFilenameType) {
+        case 1:
+          dlpath = pp + '/' + filename;
+          break;
+        case 2:
+          dlpath = pp + '/' + item.index.toString() + '.' + ext;
+          break;
+        case 3:
+          dlpath = pu + '/' + filename;
+          break;
+        case 4:
+          dlpath = pu + '/' + item.index.toString() + '.' + ext;
+          break;
+        case 5:
+          dlpath = pt + '/' + filename;
+          break;
+        case 6:
+          dlpath = pt + '/' + item.index.toString() + '.' + ext;
+          break;
+        case 7:
+          dlpath = datetime + '/' + filename;
+          break;
+        case 8:
+          dlpath = datetime + '/' + item.index.toString() + '.' + ext;
+          break;
       }
     }
-    Promise.all(proms);
+  
+    return dlpath;
+  }
 
-    indeterminateIndex = [-1, -1];
-    for(let i = 0; i < sicItemsImgList.length; i++) {
-      sicItemsImgList[i].check &= 0b011;
+  btnDownload.addEventListener('click', function () {
+    const proms: Promise<number>[] = [];
+
+    const datetime = getDLDatatime();
+
+    for(const item of sicItemsImgList) {
+      if((item.check & 0b110) && (item.check & 0b001) && item.tag !== 'SVG') {
+        if(item.image) {
+          console.log(getDLFilename(datetime, item));
+          const options: chrome.downloads.DownloadOptions = {
+            url: item.url,
+            filename: getDLFilename(datetime, item),
+            saveAs: false
+          }
+          proms.push(chrome.downloads.download(options));
+        }
+      }
+    }
+    for(const prom of proms) {
+      (async () => {
+        await prom;
+      })();
     }
   });
+
   btnCopy.addEventListener('click', function () {
     let text = '';
     for(const item of sicItemsImgList) {
@@ -779,19 +869,23 @@ document.addEventListener('DOMContentLoaded', () => {
       })();
     }
   });
+
   btnSendToAria2.addEventListener('click', function () {
     const proms: Promise<any>[] = [];
+
+    const datetime = getDLDatatime();
+
     for(const item of sicItemsImgList) {
       if((item.check & 0b110) && (item.check & 0b001) && item.tag !== 'SVG') {
-        proms.push(chrome.runtime.sendMessage('mpkodccbngfoacfalldjimigbofkhgjn', { url: item.url }));
+        if(item.image) {
+          proms.push(chrome.runtime.sendMessage('mpkodccbngfoacfalldjimigbofkhgjn', { 
+            url: item.url,
+            filename: getDLFilename(datetime, item)
+          }));
+        }
       }
     }
     Promise.all(proms);
-
-    indeterminateIndex = [-1, -1];
-    for(let i = 0; i < sicItemsImgList.length; i++) {
-      sicItemsImgList[i].check &= 0b011;
-    }
   });
 
   btnClear.addEventListener('click', function () {
@@ -804,6 +898,34 @@ document.addEventListener('DOMContentLoaded', () => {
   txtSearch.addEventListener('input', function () {
     searchText = this.value;
     updateTable();
+  });
+  txtSearch.addEventListener('keydown', function (event) {
+    if(event.key === 'Enter') {
+      const history = <HTMLDataListElement>document.getElementById('history');
+      for(let i = 0; i < sicOptionsImgList.swHistory.length; ) {
+        if(sicOptionsImgList.swHistory[i] === txtSearch.value) {
+          sicOptionsImgList.swHistory.splice(i, 1);
+        } else {
+          i++;
+       }
+      }
+      sicOptionsImgList.swHistory.push(txtSearch.value);
+      (async () => {
+        await chrome.runtime.sendMessage({
+          action: 'azo_sic_saveoptions',
+          storageoptions: convertOptionsToStorageImgList(sicOptionsImgList)
+        });
+      })();
+      for(; sicOptionsImgList.swHistory.length > 30;) {
+        sicOptionsImgList.swHistory.shift();
+      }
+      history.innerHTML = '';
+      for(let i = sicOptionsImgList.swHistory.length - 1; i > -1; i--) {
+        const item = <HTMLOptionElement>document.createElement('option');
+        item.value = sicOptionsImgList.swHistory[i];
+        history.appendChild(item);
+      }
+    }
   });
 
   rdoBgChecker.addEventListener('click', function () {

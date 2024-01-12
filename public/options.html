@@ -27,6 +27,57 @@
             <td><input id="nmbThumbWidth" type="number" min="0" placeholder="e.g. 100"></input></td>
           </tr>
           <tr>
+            <td class="bg-primary-subtle">Default search word</td>
+            <td><input id="txtDefSearchWord" type="text" class="form-text" size="30" placeholder="e.g. thisimage"></input></td>
+          </tr>
+          <tr>
+            <td class="bg-primary-subtle">Delete search history</td>
+            <td><button class="btn btn-danger" id="btnDeleteHistory">Delete</button></td>
+          </tr>
+          <tr>
+            <td class="bg-primary-subtle">Custom download filename</td>
+            <td>
+              <div class="flex">
+                <div>
+                  <input id="rdoDFDefault" type="radio" class="form-check-input" name="downloadFilename" data-value="0"></input>
+                  <label for="rdoDFDefault" class="form-check-label">filename</label>
+                </div>
+                <div>
+                  <input id="rdoDFPDefault" type="radio" class="form-check-input" name="downloadFilename" data-value="1"></input>
+                  <label for="rdoDFPDefault" class="form-check-label">parent/filename</label>
+                </div>
+                <div>
+                  <input id="rdoDFPIndex" type="radio" class="form-check-input" name="downloadFilename" data-value="2"></input>
+                  <label for="rdoDFPIndex" class="form-check-label">parent/index.ext</label>
+                </div>
+                <div>
+                  <input id="rdoDFUDefault" type="radio" class="form-check-input" name="downloadFilename" data-value="3"></input>
+                  <label for="rdoDFUDefault" class="form-check-label">url/filename</label>
+                </div>
+                <div>
+                  <input id="rdoDFUIndex" type="radio" class="form-check-input" name="downloadFilename" data-value="4"></input>
+                  <label for="rdoDFUIndex" class="form-check-label">url/index.ext</label>
+                </div>
+                <div>
+                  <input id="rdoDFTDefault" type="radio" class="form-check-input" name="downloadFilename" data-value="5"></input>
+                  <label for="rdoDFTDefault" class="form-check-label">title/filename</label>
+                </div>
+                <div>
+                  <input id="rdoDFTIndex" type="radio" class="form-check-input" name="downloadFilename" data-value="6"></input>
+                  <label for="rdoDFTIndex" class="form-check-label">title/index.ext</label>
+                </div>
+                <div>
+                  <input id="rdoDFDDefault" type="radio" class="form-check-input" name="downloadFilename" data-value="7"></input>
+                  <label for="rdoDFDDefault" class="form-check-label">datetime/filename</label>
+                </div>
+                <div>
+                  <input id="rdoDFDIndex" type="radio" class="form-check-input" name="downloadFilename" data-value="8"></input>
+                  <label for="rdoDFDIndex" class="form-check-label">datetime/index.ext</label>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr>
             <td class="bg-primary-subtle">Out of search display (grayout for check)</td>
             <td><input id="chkOosDisplay" type="checkbox" class="form-check-input"></input></td>
           </tr>

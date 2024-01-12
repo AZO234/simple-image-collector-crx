@@ -17,7 +17,7 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto pt-2 mb-2 mb-lg-0">
           <li class="nav-item dropdown">
-            <a id="btnAction" href="#" class="nav-link dropdown-toggle btn text-bg-primary" data-bs-toggle="dropdown" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="Action for select item">
+            <a id="btnAction" class="nav-link dropdown-toggle btn text-bg-primary" data-bs-toggle="dropdown" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="Action for select item">
               <i class="bi bi-download"></i> Action
               <span id="nmbSelectedCount" class="position-absolute top-0 start-100 translate-middle badge text-bg-danger rounded-pill border border-light" style="display: none;"></span>
             </a>
@@ -36,13 +36,8 @@
         <div class="d-flex" role="search">
           <div class="input-group">
             <span class="input-group-text"><i class="bi bi-search"></i></span>
-            <input id="txtSearch" class="form-control me-2" type="search" placeholder="Search" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="Search (With // to RegExp)" autocomplete="on" list="searchlist">
-            <datalist id="searchlist">
-              <option value="atoimg"></option>
-              <option value="jpg"></option>
-              <option value="png"></option>
-              <option value="svg"></option>
-            </datalist>
+            <input id="txtSearch" class="form-control me-2" type="search" placeholder="Search" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-html="true" data-bs-content="Search (With // to RegExp)<br>To save history, hit enter" autocomplete="on" list="history">
+            <datalist id="history"></datalist>
           </div>  
           <div class="btn-group me-2" role="background" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="Background color of image">
             <input type="radio" class="btn-check" name="btnradio" id="rdoBgChecker" checked>

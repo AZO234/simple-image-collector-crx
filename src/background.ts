@@ -2,6 +2,9 @@ interface sicOptions {
   imgExtPattern: RegExp;
   getAToImg: boolean;
   thumbnailWidth: number;
+  defSearchWord: string;
+  swHistory: string[];
+  dlFilenameType: number;
   rememberSort: boolean;
   sortColmun: string;
   sortOrder: string;
@@ -18,6 +21,9 @@ const sicDefOptions: sicOptions = {
   imgExtPattern: new RegExp(/\.(jpg|jpeg|png|svg|gif|webp|heic|heif|avif|tif|tiff|bmp|ico|psd|raw)(\?.*)*$/i),
   getAToImg: false,
   thumbnailWidth: 128,
+  defSearchWord: '',
+  swHistory: [],
+  dlFilenameType: 0,
   rememberSort: false,
   sortColmun: '',
   sortOrder: '',
@@ -35,6 +41,9 @@ interface sicStorageOptions {
   rxImgExtPattern: string;
   bGetAToImg: string;
   nmbThumbWidth: string;
+  txtDefSearchWord: string,
+  arySwHistory: string,
+  numDlFilenameType: string,
   bRememberSort: string;
   txtSortColumn: string;
   txtSortOrder: string;
@@ -52,6 +61,9 @@ function convertOptionsToStorage(options: sicOptions): sicStorageOptions {
     rxImgExtPattern: options.imgExtPattern.source,
     bGetAToImg: options.getAToImg.toString(),
     nmbThumbWidth: options.thumbnailWidth.toString(),
+    txtDefSearchWord: options.defSearchWord,
+    arySwHistory: options.swHistory.map(element => element.replace(/,/g, ',,')).join(','),
+    numDlFilenameType: options.dlFilenameType.toString(),
     bRememberSort: options.rememberSort.toString(),
     txtSortColumn: options.sortColmun,
     txtSortOrder: options.sortOrder,
