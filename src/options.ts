@@ -12,7 +12,6 @@ const sicDefOptionsOp: sicOptions = {
   rememberBg: true,
   bgChecker: true,
   bgColor: '#FFFFFF',
-  useDownloadDir: false,
   remove1x1: true,
   rTimeout: 10000
 };
@@ -33,7 +32,6 @@ function convertOptionsToStorageOp(options: sicOptions): sicStorageOptions {
     bRememberBg: options.rememberBg.toString(),
     bBgChecker: options.bgChecker.toString(),
     clrBgColor: options.bgColor,
-    bUseDownloadDir: options.useDownloadDir.toString(),
     bRemove1x1: options.remove1x1.toString(),
     nmbRTimeout: options.rTimeout.toString()
   };
@@ -54,7 +52,6 @@ function loadOptionsToUI() {
     bRememberBg: '',
     bBgChecker: '',
     clrBgColor: '',
-    bUseDownloadDir: '',
     bRemove1x1: '',
     nmbRTimeout: '',
   }
@@ -72,7 +69,6 @@ function loadOptionsToUI() {
     sicOptionsOp.rememberBg = result['bRememberBg'] === 'true';
     sicOptionsOp.bgChecker = result['bBgChecker'] === 'true';
     sicOptionsOp.bgColor = result['clrBgColor'];
-    sicOptionsOp.useDownloadDir = result['bUseDownloadDir'] === 'true';
     sicOptionsOp.remove1x1 = result['bRemove1x1'] === 'true';
     sicOptionsOp.rTimeout = Number(result['nmbRTimeout']);
 
@@ -92,7 +88,6 @@ function loadOptionsToUI() {
     const chkOosDisplay = <HTMLInputElement>document.getElementById('chkOosDisplay');
     const chkRememberSort = <HTMLInputElement>document.getElementById('chkRememberSort');
     const chkRememberBg = <HTMLInputElement>document.getElementById('chkRememberBg');
-    const chkUseDownloadDir = <HTMLInputElement>document.getElementById('chkUseDownloadDir');
     const chkRemove1x1 = <HTMLInputElement>document.getElementById('chkRemove1x1');
     const nmbRTimeout = <HTMLInputElement>document.getElementById('nmbRTimeout');
   
@@ -132,7 +127,6 @@ function loadOptionsToUI() {
     chkOosDisplay.checked = sicOptionsOp.oosDisplay;
     chkRememberSort.checked = sicOptionsOp.rememberSort;
     chkRememberBg.checked = sicOptionsOp.rememberBg;
-    chkUseDownloadDir.checked = sicOptionsOp.useDownloadDir;
     chkRemove1x1.checked = sicOptionsOp.remove1x1;
     nmbRTimeout.value = sicOptionsOp.rTimeout.toString();
   });
@@ -155,7 +149,6 @@ function saveOptionsFromUI() {
   const chkOosDisplay = <HTMLInputElement>document.getElementById('chkOosDisplay');
   const chkRememberSort = <HTMLInputElement>document.getElementById('chkRememberSort');
   const chkRememberBg = <HTMLInputElement>document.getElementById('chkRememberBg');
-  const chkUseDownloadDir = <HTMLInputElement>document.getElementById('chkUseDownloadDir');
   const chkRemove1x1 = <HTMLInputElement>document.getElementById('chkRemove1x1');
   const nmbRTimeout = <HTMLInputElement>document.getElementById('nmbRTimeout');
 
@@ -225,9 +218,6 @@ function saveOptionsFromUI() {
 
   // Remember background color of image
   sicOptionsOp.rememberBg = chkRememberBg.checked;
-
-  // Use download directory
-  sicOptionsOp.useDownloadDir = chkUseDownloadDir.checked;
 
   // Remove 1x1 image
   sicOptionsOp.remove1x1 = chkRemove1x1.checked;

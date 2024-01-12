@@ -12,7 +12,6 @@ const sicDefOptionsImgList: sicOptions = {
   rememberBg: true,
   bgChecker: true,
   bgColor: '#FFFFFF',
-  useDownloadDir: false,
   remove1x1: true,
   rTimeout: 10000
 };
@@ -33,7 +32,6 @@ function convertOptionsToStorageImgList(options: sicOptions): sicStorageOptions 
     bRememberBg: options.rememberSort.toString(),
     bBgChecker: options.bgChecker.toString(),
     clrBgColor: options.bgColor,
-    bUseDownloadDir: options.useDownloadDir.toString(),
     bRemove1x1: options.remove1x1.toString(),
     nmbRTimeout: options.rTimeout.toString()
   };
@@ -54,7 +52,6 @@ function loadOptionsImgList(message: any) {
     sicOptionsImgList.oosDisplay = result['bOosDisplay'] === 'true';
     sicOptionsImgList.bgChecker = result['bBgChecker'] === 'true';
     sicOptionsImgList.bgColor = result['clrBgColor'];
-    sicOptionsImgList.useDownloadDir = result['bUseDownloadDir'] === 'true';
     sicOptionsImgList.remove1x1 = result['bRemove1x1'] === 'true';
     sicOptionsImgList.rTimeout = Number(result['nmbRTimeout']);
 
