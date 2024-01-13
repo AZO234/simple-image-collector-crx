@@ -79,6 +79,14 @@ function saveOptions(options: sicOptions) {
 
 function saveOptionsFromStorage(storageoptions: sicStorageOptions) {
   chrome.storage.sync.set(storageoptions);
+
+  chrome.tabs.query({ url: chrome.runtime.getURL('imglist.html') }, async (tabs) => {
+    for(const tab of tabs) {
+      if(tab.id) {
+        await chrome.tabs.sendMessage(tab.id, { action: 'azo_sic_loadoptions' });
+      }
+    }
+  });
 }
 
 // on extension installed
@@ -94,19 +102,19 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 // on click extentions icon
-chrome.action.onClicked.addListener((tab) => {
+chrome.action.onClicked.addListener(async (tab) => {
   if(tab.id) {
-    chrome.tabs.sendMessage(tab.id, { action: 'azo_sic_collectitems' });
+    await chrome.tabs.sendMessage(tab.id, { action: 'azo_sic_collectitems' });
   }
 });
 
 // on click contextmenu
-chrome.contextMenus.onClicked.addListener((info, tab) => {
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if(tab && tab.id) {
     switch(info.menuItemId) {
       case 'azo_sic_ci': 
         if(tab.id) {
-          chrome.tabs.sendMessage(tab.id, { action: 'azo_sic_collectitems' });
+          await chrome.tabs.sendMessage(tab.id, { action: 'azo_sic_collectitems' });
         }
         break;
     }

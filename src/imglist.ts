@@ -37,7 +37,7 @@ function convertOptionsToStorageImgList(options: sicOptions): sicStorageOptions 
   };
 }
 
-function loadOptionsImgList(message: any) {
+function loadOptionsImgList() {
   const storageOptions: sicStorageOptions = convertOptionsToStorageImgList(sicOptionsImgList);
   chrome.storage.sync.get(Object.keys(storageOptions), (result) => {
     sicOptionsImgList.imgExtPattern = new RegExp(result['rxImgExtPattern']);
@@ -54,9 +54,15 @@ function loadOptionsImgList(message: any) {
     sicOptionsImgList.bgColor = result['clrBgColor'];
     sicOptionsImgList.remove1x1 = result['bRemove1x1'] === 'true';
     sicOptionsImgList.rTimeout = Number(result['nmbRTimeout']);
-
-    start(message.title, message.url, message.sicitems);
   });
+
+  const history = <HTMLDataListElement>document.getElementById('history');
+  history.innerHTML = '';
+  for(let i = sicOptionsImgList.swHistory.length - 1; i > -1; i--) {
+    const item = <HTMLOptionElement>document.createElement('option');
+    item.value = sicOptionsImgList.swHistory[i];
+    history.appendChild(item);
+  }
 }
 
 const sicItemsImgList: sicItem[] = [];
@@ -169,8 +175,11 @@ async function getImageInfo(item: sicItem, timeout = 10000): Promise<number> {
 chrome.runtime.onMessage.addListener((message) => {
   switch(message.action) {
     case 'azo_sic_sendlist':
-      // load options
-      loadOptionsImgList(message);
+      loadOptionsImgList();
+      start(message.title, message.url, message.sicitems);
+      break;
+    case 'azo_sic_loadoptions':
+      loadOptionsImgList();
       break;
   }
 });
@@ -656,7 +665,7 @@ function idClick(item: sicItem) {
     } else {
       // add indeterminate select
       if((item.check & 0b100) === 0) {
-        if(!(sicItemsImgList[i].check & 0b001)) {
+        if(sicOptionsImgList.oosDisplay || (sicItemsImgList[i].check & 0b001)) {
           item.check |= 0b100;
         }
         updateRow(item);
@@ -834,8 +843,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if(item.image) {
           console.log(getDLFilename(datetime, item));
           const options: chrome.downloads.DownloadOptions = {
-            url: item.url,
             filename: getDLFilename(datetime, item),
+            url: item.url,
             saveAs: false
           }
           proms.push(chrome.downloads.download(options));
@@ -898,7 +907,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   txtSearch.addEventListener('keydown', function (event) {
     if(event.key === 'Enter') {
-      const history = <HTMLDataListElement>document.getElementById('history');
       for(let i = 0; i < sicOptionsImgList.swHistory.length; ) {
         if(sicOptionsImgList.swHistory[i] === txtSearch.value) {
           sicOptionsImgList.swHistory.splice(i, 1);
@@ -907,21 +915,15 @@ document.addEventListener('DOMContentLoaded', () => {
        }
       }
       sicOptionsImgList.swHistory.push(txtSearch.value);
+      if(sicOptionsImgList.swHistory.length > 30) {
+        sicOptionsImgList.swHistory.shift();
+      }
       (async () => {
         await chrome.runtime.sendMessage({
           action: 'azo_sic_saveoptions',
           storageoptions: convertOptionsToStorageImgList(sicOptionsImgList)
         });
       })();
-      for(; sicOptionsImgList.swHistory.length > 30;) {
-        sicOptionsImgList.swHistory.shift();
-      }
-      history.innerHTML = '';
-      for(let i = sicOptionsImgList.swHistory.length - 1; i > -1; i--) {
-        const item = <HTMLOptionElement>document.createElement('option');
-        item.value = sicOptionsImgList.swHistory[i];
-        history.appendChild(item);
-      }
     }
   });
 
