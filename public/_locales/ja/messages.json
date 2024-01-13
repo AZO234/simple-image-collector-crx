@@ -1,0 +1,186 @@
+{
+  "description_sic": {
+    "message": "ページ内の画像を収集するシンプルなコレクターです。",
+    "description": "Description of simple-image-collector."
+  },
+  "action": {
+    "message": "アクション",
+    "description": "Actions for selected images."
+  },
+  "action_popover": {
+    "message": "選択された画像へのアクション。",
+    "description": "popover for Action button."
+  },
+  "download": {
+    "message": "ダウンロード",
+    "description": "Download selected images."
+  },
+  "download_popover": {
+    "message": "選択された画像をダウンロード。",
+    "description": "popover for Download button."
+  },
+  "copy": {
+    "message": "コピー",
+    "description": "Copy URLs of selected images."
+  },
+  "copy_popover": {
+    "message": "選択された画像の URL をコピー。",
+    "description": "popover for Copy button."
+  },
+  "send_to_aria2": {
+    "message": "Aria2 に送信",
+    "description": "Download selected images with Aria2."
+  },
+  "send_to_aria2_popover": {
+    "message": "選択された画像を Aria2 でダウンロード。",
+    "description": "popover for Send to Aria2 button."
+  },
+  "clear": {
+    "message": "解除",
+    "description": "Clear all images selection."
+  },
+  "clear_popover": {
+    "message": "画像の選択を全て解除。",
+    "description": "popover for Clear button."
+  },
+  "search": {
+    "message": "検索",
+    "description": "Search for inside list."
+  },
+  "search_popover": {
+    "message": "検索 (/.../ で RegExp)<br>Enter キーで履歴に保存。",
+    "description": "popover for Search."
+  },
+  "checker": {
+    "message": "チェッカー",
+    "description": "Checker for background of thumbnail."
+  },
+  "color": {
+    "message": "色",
+    "description": "Color for background of thumbnail."
+  },
+  "background_popover": {
+    "message": "サムネイルの背景色。",
+    "description": "popover for background selection."
+  },
+  "options_popover": {
+    "message": "オプションのページを開く。",
+    "description": "popover for Options button."
+  },
+  "page_top_popover": {
+    "message": "ページの先頭へ移動。",
+    "description": "popover for Page top button."
+  },
+  "page_bottom_popover": {
+    "message": "ページの末尾へ移動。",
+    "description": "popover for Page bottom button."
+  },
+  "th_index": {
+    "message": "番号",
+    "description": "table header for index."
+  },
+  "th_check": {
+    "message": "チェック",
+    "description": "table header for Check."
+  },
+  "th_tag": {
+    "message": "タグ",
+    "description": "table header for Tag."
+  },
+  "th_type": {
+    "message": "種別",
+    "description": "table header for Type."
+  },
+  "th_mime": {
+    "message": "MIME",
+    "description": "table header for MIME type."
+  },
+  "th_url_info": {
+    "message": "URL & 情報",
+    "description": "table header for URL & Information."
+  },
+  "img_ext_pattern": {
+    "message": "画像として扱う拡張子パターン(RegExp 形式)",
+    "description": "Explanation ext RegExp pattern as image."
+  },
+  "img_ext_pattern_placeholder": {
+    "message": "例 /\\.(jpg|jpeg)$/",
+    "description": "Example for ext pattern."
+  },
+  "sic_options": {
+    "message": "simple-image-collector オプション",
+    "description": "simple-image-collector options title."
+  },
+  "get_atoimg": {
+    "message": "atoimg を取得 (外部の画像へのリンク)",
+    "description": "Explanation getting atoimg option."
+  },
+  "thumbnail_width": {
+    "message": "サムネイルの幅",
+    "description": "thumbnail width."
+  },
+  "thumbnail_width_placeholder": {
+    "message": "例 100",
+    "description": "Example for thumbnail width."
+  },
+  "default_search_word": {
+    "message": "デフォルトの検索ワード",
+    "description": "default search word."
+  },
+  "default_search_word_placeholder": {
+    "message": "例 thisimage",
+    "description": "Example for default search word."
+  },
+  "delete_search_word_history": {
+    "message": "検索履歴を消去",
+    "description": "Explanation Delete search word history button."
+  },
+  "delete": {
+    "message": "消去",
+    "description": "Delete."
+  },
+  "custom_download_filename": {
+    "message": "ダウンロードするファイル名をカスタマイズ",
+    "description": "Explanation how filename locate and rename."
+  },
+  "display_outofsearch": {
+    "message": "検索外もグレーアウトして表示",
+    "description": "Explanation display out of search row."
+  },
+  "remember_sort": {
+    "message": "ソート順序を記憶",
+    "description": "Remember sort column and order."
+  },
+  "remember_background": {
+    "message": "サムネイル背景色を記憶",
+    "description": "Remember background color of thumbnail."
+  },
+  "remove_1x1": {
+    "message": "1x1 のサイズの画像を取り除く",
+    "description": "Remove 1x1 size images."
+  },
+  "read_timeout": {
+    "message": "読み込みタイムアウト (ms)",
+    "description": "Timeout for reading by ms."
+  },
+  "read_timeout_placeholder": {
+    "message": "例 10000",
+    "description": "Example for timeout."
+  },
+  "back_default": {
+    "message": "デフォルトに戻す",
+    "description": "Back to default all options."
+  },
+  "save": {
+    "message": "保存",
+    "description": "Save options."
+  },
+  "images_in": {
+    "message": "以下のページの画像",
+    "description": "Images in page."
+  },
+  "in_css": {
+    "message": "CSS内",
+    "description": "Images in CSS."
+  }
+}

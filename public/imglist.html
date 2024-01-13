@@ -12,38 +12,38 @@
   <div class="container-fluid sticky-top bg-light opacity-75 p-3">
     <div class="row">
       <div class="col d-flex float-start">
-        <span tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="Actions for selected items">
-          <button id="btnAction" class="btn text-bg-primary dropdown-toggle position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-download"></i> Action
+        <span tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="__MSG_action_popover__">
+          <button id="btnAction" class="btn text-bg-primary dropdown-toggle position-relative text-nowrap" type="button" data-bs-toggle="dropdown" aria-expanded="false" disabled>
+            <i class="bi bi-download"></i> __MSG_action__
             <span id="nmbSelectedCount" class="position-absolute top-0 start-100 translate-middle badge text-bg-danger rounded-pill border border-light" style="display: none;"></span>
           </button>
           <ul class="dropdown-menu">
-            <li><button id="btnDownload" class="dropdown-item" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="Download select items"><i class="bi bi-download"></i> Download</button></li>
-            <li><button id="btnCopy" class="dropdown-item" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="Copy select items URL"><i class="bi bi-copy"></i> Copy</button></li>
-            <li><button id="btnSendToAria2" class="dropdown-item" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="Send select items to Aria2-Explorer"><i class="bi bi-send"></i> Send to Aria2</button></li>
+            <li><button id="btnDownload" class="dropdown-item text-nowrap" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="__MSG_download_popover__"><i class="bi bi-download"></i> __MSG_download__</button></li>
+            <li><button id="btnCopy" class="dropdown-item text-nowrap" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="__MSG_copy_popover__"><i class="bi bi-copy"></i> __MSG_copy__</button></li>
+            <li><button id="btnSendToAria2" class="dropdown-item text-nowrap" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="__MSG_send_to_aria2_popover__"><i class="bi bi-send"></i> __MSG_send_to_aria2__</button></li>
           </ul>
         </span>
-        <span class="ms-3" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="Clear items selection">
-          <button id="btnClear" class="btn text-bg-danger" type="button"><i class="bi bi-slash-square"></i> Clear</button>
+        <span class="ms-3" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="__MSG_clear_popover__">
+          <button id="btnClear" class="btn text-bg-danger text-nowrap" type="button" disabled><i class="bi bi-slash-square"></i> __MSG_clear__</button>
         </span>
       </div>
       <div class="col d-flex float-end">
         <div class="input-group">
           <span class="input-group-text"><i class="bi bi-search"></i></span>
-          <input id="txtSearch" class="form-control me-2" type="search" placeholder="Search" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-html="true" data-bs-content="Search (With // to RegExp)<br>To save history, hit enter" autocomplete="on" list="history" />
+          <input id="txtSearch" class="form-control me-2" type="search" placeholder="__MSG_search__" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-html="true" data-bs-content="__MSG_search_popover__" autocomplete="on" list="history" />
         </div>
         <datalist id="history"></datalist>
-        <div class="btn-group me-2" role="background" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="Background color of image">
+        <div class="btn-group me-2" role="background" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="__MSG_background_popover__">
           <input type="radio" class="btn-check" name="btnradio" id="rdoBgChecker" checked />
-          <label class="btn btn-outline-secondary" for="rdoBgChecker">Checker</label>
+          <label class="btn btn-outline-secondary text-nowrap" for="rdoBgChecker">__MSG_checker__</label>
           <input type="radio" class="btn-check" name="btnradio" id="rdoBgColor" />
-          <label class="btn btn-outline-secondary" for="rdoBgColor">Color</label>
+          <label class="btn btn-outline-secondary text-nowrap" for="rdoBgColor">__MSG_color__</label>
         </div>
         <input type="color" id="clrBgColor" class="me-2" />
-        <button id="btnOptions" class="btn text-bg-secondary me-2" type="button" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="Options"><i class="bi bi-gear-fill"></i></button>
+        <button id="btnOptions" class="btn text-bg-secondary me-2" type="button" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="__MSG_options_popover__"><i class="bi bi-gear-fill"></i></button>
         <div class="btn-group" role="background">
-          <button id="btnToTop" class="btn text-bg-secondary" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="Go to page top"><i class="bi bi-file-arrow-up"></i></button>
-          <button id="btnToBottom" class="btn text-bg-secondary" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="Go to page bottom"><i class="bi bi-file-arrow-down"></i></button>
+          <button id="btnToTop" class="btn text-bg-secondary" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="__MSG_page_top_popover__"><i class="bi bi-file-arrow-up"></i></button>
+          <button id="btnToBottom" class="btn text-bg-secondary" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-content="__MSG_page_bottom_popover__"><i class="bi bi-file-arrow-down"></i></button>
         </div>
       </div>
     </div>
@@ -53,12 +53,12 @@
   <table class="table table-bordered m-3 text-center">
     <thead>
       <tr class="table-primary">
-        <th scope="col" data-sort="id" class="text-center">ID <i class="bi bi-sort-alpha-down"></i></th>
-        <th scope="col" data-sort="chk" class="text-center">Chk<i class="bi bi-sort-alpha-down"></i></th>
-        <th scope="col" data-sort="tag" class="text-center">Tag<i class="bi bi-sort-alpha-down"></i></th>
-        <th scope="col" data-sort="type" class="text-center">Type<i class="bi bi-sort-alpha-down"></i></th>
-        <th scope="col" data-sort="mime" class="text-center">MIME<i class="bi bi-sort-alpha-down"></i></th>
-        <th scope="col" data-sort="url" class="text-center">URL&Info<i class="bi bi-sort-alpha-down"></i></th>
+        <th scope="col" data-sort="id" class="text-center">__MSG_th_index__ <i class="bi bi-sort-alpha-down"></i></th>
+        <th scope="col" data-sort="chk" class="text-center">__MSG_th_check__<i class="bi bi-sort-alpha-down"></i></th>
+        <th scope="col" data-sort="tag" class="text-center">__MSG_th_tag__<i class="bi bi-sort-alpha-down"></i></th>
+        <th scope="col" data-sort="type" class="text-center">__MSG_th_type__<i class="bi bi-sort-alpha-down"></i></th>
+        <th scope="col" data-sort="mime" class="text-center">__MSG_th_mime__<i class="bi bi-sort-alpha-down"></i></th>
+        <th scope="col" data-sort="url" class="text-center">__MSG_th_url_info__<i class="bi bi-sort-alpha-down"></i></th>
       </tr>
     </thead>
     <tbody id="table-body" class="text-center">

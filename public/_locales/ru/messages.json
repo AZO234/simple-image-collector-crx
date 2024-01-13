@@ -1,0 +1,186 @@
+{
+  "description_sic": {
+    "message": "Простые изображения сборщика страниц.",
+    "description": "Description of simple-image-collector."
+  },
+  "action": {
+    "message": "Действие",
+    "description": "Actions for selected images."
+  },
+  "action_popover": {
+    "message": "Действия для выбранных изображений.",
+    "description": "popover for Action button."
+  },
+  "download": {
+    "message": "Скачать",
+    "description": "Download selected images."
+  },
+  "download_popover": {
+    "message": "Загрузите выбранные изображения.",
+    "description": "popover for Download button."
+  },
+  "copy": {
+    "message": "Копировать",
+    "description": "Copy URLs of selected images."
+  },
+  "copy_popover": {
+    "message": "Скопируйте URL-адреса выбранных изображений.",
+    "description": "popover for Copy button."
+  },
+  "send_to_aria2": {
+    "message": "Отправить в Aria2",
+    "description": "Download selected images with Aria2."
+  },
+  "send_to_aria2_popover": {
+    "message": "Загрузите выбранные изображения с помощью Aria2.",
+    "description": "popover for Send to Aria2 button."
+  },
+  "clear": {
+    "message": "Прозрачный",
+    "description": "Clear all images selection."
+  },
+  "clear_popover": {
+    "message": "Очистить выбор всех изображений.",
+    "description": "popover for Clear button."
+  },
+  "search": {
+    "message": "Поиск",
+    "description": "Search for inside list."
+  },
+  "search_popover": {
+    "message": "Поиск (с помощью /.../ в RegExp)<br>Чтобы сохранить историю, нажмите Enter.",
+    "description": "popover for Search."
+  },
+  "checker": {
+    "message": "Шашка",
+    "description": "Checker for background of thumbnail."
+  },
+  "color": {
+    "message": "Цвет",
+    "description": "Color for background of thumbnail."
+  },
+  "background_popover": {
+    "message": "Цвет фона миниатюры.",
+    "description": "popover for background selection."
+  },
+  "options_popover": {
+    "message": "Открыть страницу параметров.",
+    "description": "popover for Options button."
+  },
+  "page_top_popover": {
+    "message": "Перейти наверх страницы.",
+    "description": "popover for Page top button."
+  },
+  "page_bottom_popover": {
+    "message": "Перейти в низ страницы.",
+    "description": "popover for Page bottom button."
+  },
+  "th_index": {
+    "message": "Число",
+    "description": "table header for index."
+  },
+  "th_check": {
+    "message": "Проверять",
+    "description": "table header for Check."
+  },
+  "th_tag": {
+    "message": "Ярлык",
+    "description": "table header for Tag."
+  },
+  "th_type": {
+    "message": "Тип",
+    "description": "table header for Type."
+  },
+  "th_mime": {
+    "message": "MIME",
+    "description": "table header for MIME type."
+  },
+  "th_url_info": {
+    "message": "URL и информация",
+    "description": "table header for URL & Information."
+  },
+  "img_ext_pattern": {
+    "message": "Шаблон расширения в виде изображения (формат RegExp)",
+    "description": "Explanation ext RegExp pattern as image."
+  },
+  "img_ext_pattern_placeholder": {
+    "message": "пример /\\.(jpg|jpeg)$/",
+    "description": "Example for ext pattern."
+  },
+  "sic_options": {
+    "message": "simple-image-collector параметры",
+    "description": "simple-image-collector options title."
+  },
+  "get_atoimg": {
+    "message": "Получить atoimg (ссылка на изображение вне страницы)",
+    "description": "Explanation getting atoimg option."
+  },
+  "thumbnail_width": {
+    "message": "Ширина миниатюры",
+    "description": "thumbnail width."
+  },
+  "thumbnail_width_placeholder": {
+    "message": "пример 100",
+    "description": "Example for thumbnail width."
+  },
+  "default_search_word": {
+    "message": "Слово для поиска по умолчанию",
+    "description": "default search word."
+  },
+  "default_search_word_placeholder": {
+    "message": "пример thisimage",
+    "description": "Example for default search word."
+  },
+  "delete_search_word_history": {
+    "message": "Удалить историю поисковых слов",
+    "description": "Explanation Delete search word history button."
+  },
+  "delete": {
+    "message": "Удалить",
+    "description": "Delete."
+  },
+  "custom_download_filename": {
+    "message": "Пользовательское имя файла загрузки",
+    "description": "Explanation how filename locate and rename."
+  },
+  "display_outofsearch": {
+    "message": "Отображать вне поиска с затемнением",
+    "description": "Explanation display out of search row."
+  },
+  "remember_sort": {
+    "message": "Запомнить порядок сортировки",
+    "description": "Remember sort column and order."
+  },
+  "remember_background": {
+    "message": "Запомните цвет фона миниатюры",
+    "description": "Remember background color of thumbnail."
+  },
+  "remove_1x1": {
+    "message": "Удалить изображение размером 1x1",
+    "description": "Remove 1x1 size images."
+  },
+  "read_timeout": {
+    "message": "Таймаут на чтение (мс)",
+    "description": "Timeout for reading by ms."
+  },
+  "read_timeout_placeholder": {
+    "message": "пример 10000",
+    "description": "Example for timeout."
+  },
+  "back_default": {
+    "message": "Назад по умолчанию",
+    "description": "Back to default all options."
+  },
+  "save": {
+    "message": "Сохранять",
+    "description": "Save options."
+  },
+  "images_in": {
+    "message": "Изображения в",
+    "description": "Images in page."
+  },
+  "in_css": {
+    "message": "в CSS",
+    "description": "Images in CSS."
+  }
+}

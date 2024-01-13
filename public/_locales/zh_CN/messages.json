@@ -1,0 +1,186 @@
+{
+  "description_sic": {
+    "message": "页面收集器的简单图像。",
+    "description": "Description of simple-image-collector."
+  },
+  "action": {
+    "message": "行动",
+    "description": "Actions for selected images."
+  },
+  "action_popover": {
+    "message": "针对选定图像的操作。",
+    "description": "popover for Action button."
+  },
+  "download": {
+    "message": "下载",
+    "description": "Download selected images."
+  },
+  "download_popover": {
+    "message": "下载选定的图像。",
+    "description": "popover for Download button."
+  },
+  "copy": {
+    "message": "复制",
+    "description": "Copy URLs of selected images."
+  },
+  "copy_popover": {
+    "message": "复制所选图像的 URL。",
+    "description": "popover for Copy button."
+  },
+  "send_to_aria2": {
+    "message": "发送至 Aria2",
+    "description": "Download selected images with Aria2."
+  },
+  "send_to_aria2_popover": {
+    "message": "使用 Aria2 下载选定的图像。",
+    "description": "popover for Send to Aria2 button."
+  },
+  "clear": {
+    "message": "清除",
+    "description": "Clear all images selection."
+  },
+  "clear_popover": {
+    "message": "清除所有图像选择。",
+    "description": "popover for Clear button."
+  },
+  "search": {
+    "message": "搜索",
+    "description": "Search for inside list."
+  },
+  "search_popover": {
+    "message": "搜索（使用 /.../ 到正则表达式）<br>要保存历史记录，请按 Enter 键。",
+    "description": "popover for Search."
+  },
+  "checker": {
+    "message": "方格",
+    "description": "Checker for background of thumbnail."
+  },
+  "color": {
+    "message": "颜色",
+    "description": "Color for background of thumbnail."
+  },
+  "background_popover": {
+    "message": "缩略图的背景颜色。",
+    "description": "popover for background selection."
+  },
+  "options_popover": {
+    "message": "打开选项页面。",
+    "description": "popover for Options button."
+  },
+  "page_top_popover": {
+    "message": "转到页面顶部。",
+    "description": "popover for Page top button."
+  },
+  "page_bottom_popover": {
+    "message": "转到页面底部。",
+    "description": "popover for Page bottom button."
+  },
+  "th_index": {
+    "message": "指数",
+    "description": "table header for index."
+  },
+  "th_check": {
+    "message": "查看",
+    "description": "table header for Check."
+  },
+  "th_tag": {
+    "message": "标签",
+    "description": "table header for Tag."
+  },
+  "th_type": {
+    "message": "类型",
+    "description": "table header for Type."
+  },
+  "th_mime": {
+    "message": "MIME",
+    "description": "table header for MIME type."
+  },
+  "th_url_info": {
+    "message": "网址及信息",
+    "description": "table header for URL & Information."
+  },
+  "img_ext_pattern": {
+    "message": "扩展模式作为图像（RegExp 格式）",
+    "description": "Explanation ext RegExp pattern as image."
+  },
+  "img_ext_pattern_placeholder": {
+    "message": "示例 /\\.(jpg|jpeg)$/",
+    "description": "Example for ext pattern."
+  },
+  "sic_options": {
+    "message": "simple-image-collector 选项",
+    "description": "simple-image-collector options title."
+  },
+  "get_atoimg": {
+    "message": "获取 atoimg（页外图片链接）",
+    "description": "Explanation getting atoimg option."
+  },
+  "thumbnail_width": {
+    "message": "缩略图宽度",
+    "description": "thumbnail width."
+  },
+  "thumbnail_width_placeholder": {
+    "message": "示例 100",
+    "description": "Example for thumbnail width."
+  },
+  "default_search_word": {
+    "message": "默认搜索词",
+    "description": "default search word."
+  },
+  "default_search_word_placeholder": {
+    "message": "示例 thisimage",
+    "description": "Example for default search word."
+  },
+  "delete_search_word_history": {
+    "message": "删除搜索词历史记录",
+    "description": "Explanation Delete search word history button."
+  },
+  "delete": {
+    "message": "删除",
+    "description": "Delete."
+  },
+  "custom_download_filename": {
+    "message": "自定义下载文件名",
+    "description": "Explanation how filename locate and rename."
+  },
+  "display_outofsearch": {
+    "message": "显示在搜索之外并呈灰色显示",
+    "description": "Explanation display out of search row."
+  },
+  "remember_sort": {
+    "message": "记住排序顺序",
+    "description": "Remember sort column and order."
+  },
+  "remember_background": {
+    "message": "记住缩略图的背景颜色",
+    "description": "Remember background color of thumbnail."
+  },
+  "remove_1x1": {
+    "message": "删除 1x1 尺寸的图像",
+    "description": "Remove 1x1 size images."
+  },
+  "read_timeout": {
+    "message": "读取超时时间（ms）",
+    "description": "Timeout for reading by ms."
+  },
+  "read_timeout_placeholder": {
+    "message": "示例 10000",
+    "description": "Example for timeout."
+  },
+  "back_default": {
+    "message": "返回默认值",
+    "description": "Back to default all options."
+  },
+  "save": {
+    "message": "保存",
+    "description": "Save options."
+  },
+  "images_in": {
+    "message": "图像位于",
+    "description": "Images in page."
+  },
+  "in_css": {
+    "message": "在CSS中",
+    "description": "Images in CSS."
+  }
+}

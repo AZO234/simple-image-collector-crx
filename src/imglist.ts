@@ -84,7 +84,7 @@ async function getImageInfo(item: sicItem, timeout = 10000): Promise<number> {
       return;
     }
     if(/^data:/i.test(item.image.url)) {
-      console.log(`gii: Url is data. ${item.image.url}`);
+      console.log(`gii: URL is data. ${item.image.url}`);
       resolve(2);
       return;
     }
@@ -219,9 +219,10 @@ async function start(title: string, url: string, sicWorkItems: sicItem[]) {
 
   // title ('h' tag)
   const hListTitle = document.getElementById('listtitle');
+  const strImagesIn = chrome.i18n.getMessage("images_in");
   if(hListTitle) {
     hListTitle.innerHTML = `
-      <i class="bi bi-image"></i> Images in :<br>
+      <i class="bi bi-image"></i> ${strImagesIn} :<br>
       <a class="link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="${url}" target="_blank">${title}</a>`;
   }
 
@@ -262,6 +263,7 @@ async function start(title: string, url: string, sicWorkItems: sicItem[]) {
 
   // Initial table rendering
   updateTable();
+  updateSelectedCount();
 
   // sort
   if(sicOptionsImgList.rememberSort && sicOptionsImgList.sortColmun !== '') {
@@ -375,7 +377,7 @@ function updateRow(item: sicItem) {
             <div class="col-6 col-lg-9 text-start">
               ${item.iframeIndex ? '<br>iframe: ' + item.iframeIndex : ''}
               ${item.iframeDepth ? '<br>depth: ' + item.iframeDepth : ''}
-              ${item.image.inCSS ? '<br>in CSS' : ''}
+              ${item.image.inCSS ? '<br>' + chrome.i18n.getMessage("in_css") : ''}
             </div>
           </div>
         </div>`;
@@ -390,7 +392,7 @@ function updateRow(item: sicItem) {
               ${item.image.width}x${item.image.height}
               ${item.iframeIndex ? '<br>iframe: ' + item.iframeIndex : ''}
               ${item.iframeDepth ? '<br>depth: ' + item.iframeDepth : ''}
-              ${item.image.inCSS ? '<br>in CSS' : ''}
+              ${item.image.inCSS ? '<br>' + chrome.i18n.getMessage("in_css") : ''}
             </div>
           </div>
           <div class="row">
@@ -432,7 +434,7 @@ function updateRow(item: sicItem) {
               ${item.image.data}
             </div>  
             <div class="col-6 col-lg-9 text-start">
-              ${item.image.inCSS ? '<br>in CSS' : ''}
+              ${item.image.inCSS ? '<br>' + chrome.i18n.getMessage("in_css") : ''}
             </div>
           </div>
         </div>`;
@@ -445,7 +447,7 @@ function updateRow(item: sicItem) {
             </div>
             <div class="col-6 col-lg-9 text-start">
               ${item.image.width}x${item.image.height}
-              ${item.image.inCSS ? '<br>in CSS' : ''}
+              ${item.image.inCSS ? '<br>' + chrome.i18n.getMessage("in_css") : ''}
             </div>
           </div>
           <div class="row">
@@ -841,7 +843,6 @@ document.addEventListener('DOMContentLoaded', () => {
     for(const item of sicItemsImgList) {
       if((item.check & 0b110) && (item.check & 0b001) && item.tag !== 'SVG') {
         if(item.image) {
-          console.log(getDLFilename(datetime, item));
           const options: chrome.downloads.DownloadOptions = {
             filename: getDLFilename(datetime, item),
             url: item.url,
@@ -977,3 +978,19 @@ document.addEventListener('DOMContentLoaded', () => {
     window.scrollTo(0, document.body.scrollHeight);
   });
 });
+
+function localizeHtmlPageImgList() {
+  // Localize by replacing __MSG_***__ meta tags
+  const objects = document.getElementsByTagName('html');
+  for(let j = 0; j < objects.length; j++) {
+    const obj = objects[j];
+    const valStrH = obj.innerHTML.toString();
+    const valNewH = valStrH.replace(/__MSG_(\w+)__/g, function(match, v1) {
+      return v1 ? chrome.i18n.getMessage(v1) : '';
+    });
+    if(valNewH !== valStrH) {
+      obj.innerHTML = valNewH;
+    }
+  }
+}
+localizeHtmlPageImgList();

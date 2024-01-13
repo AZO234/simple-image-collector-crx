@@ -1,0 +1,186 @@
+{
+  "description_sic": {
+    "message": "Simple images of page collector.",
+    "description": "Description of simple-image-collector."
+  },
+  "action": {
+    "message": "Action",
+    "description": "Actions for selected images."
+  },
+  "action_popover": {
+    "message": "Actions for selected images.",
+    "description": "popover for Action button."
+  },
+  "download": {
+    "message": "Download",
+    "description": "Download selected images."
+  },
+  "download_popover": {
+    "message": "Download select images.",
+    "description": "popover for Download button."
+  },
+  "copy": {
+    "message": "Copy",
+    "description": "Copy URLs of selected images."
+  },
+  "copy_popover": {
+    "message": "Copy URLs of selected images.",
+    "description": "popover for Copy button."
+  },
+  "send_to_aria2": {
+    "message": "Send to Aria2",
+    "description": "Download selected images with Aria2."
+  },
+  "send_to_aria2_popover": {
+    "message": "Download selected images with Aria2.",
+    "description": "popover for Send to Aria2 button."
+  },
+  "clear": {
+    "message": "Clear",
+    "description": "Clear all images selection."
+  },
+  "clear_popover": {
+    "message": "Clear all images selection.",
+    "description": "popover for Clear button."
+  },
+  "search": {
+    "message": "Search",
+    "description": "Search for inside list."
+  },
+  "search_popover": {
+    "message": "Search (With /.../ to RegExp)<br>To save history, hit enter.",
+    "description": "popover for Search."
+  },
+  "checker": {
+    "message": "Checker",
+    "description": "Checker for background of thumbnail."
+  },
+  "color": {
+    "message": "Color",
+    "description": "Color for background of thumbnail."
+  },
+  "background_popover": {
+    "message": "Background color of thumbnail.",
+    "description": "popover for background selection."
+  },
+  "options_popover": {
+    "message": "Open options page.",
+    "description": "popover for Options button."
+  },
+  "page_top_popover": {
+    "message": "Go to page top.",
+    "description": "popover for Page top button."
+  },
+  "page_bottom_popover": {
+    "message": "Go to page bottom.",
+    "description": "popover for Page bottom button."
+  },
+  "th_index": {
+    "message": "Index",
+    "description": "table header for index."
+  },
+  "th_check": {
+    "message": "Chk",
+    "description": "table header for Check."
+  },
+  "th_tag": {
+    "message": "Tag",
+    "description": "table header for Tag."
+  },
+  "th_type": {
+    "message": "Type",
+    "description": "table header for Type."
+  },
+  "th_mime": {
+    "message": "MIME",
+    "description": "table header for MIME type."
+  },
+  "th_url_info": {
+    "message": "URL & Info",
+    "description": "table header for URL & Information."
+  },
+  "img_ext_pattern": {
+    "message": "Ext pattern as image (RegExp format)",
+    "description": "Explanation ext RegExp pattern as image."
+  },
+  "img_ext_pattern_placeholder": {
+    "message": "e.g. /\\.(jpg|jpeg)$/",
+    "description": "Example for ext pattern."
+  },
+  "sic_options": {
+    "message": "simple-image-collector options",
+    "description": "simple-image-collector options title."
+  },
+  "get_atoimg": {
+    "message": "Get atoimg (out of pages image link)",
+    "description": "Explanation getting atoimg option."
+  },
+  "thumbnail_width": {
+    "message": "Thumbnail width",
+    "description": "thumbnail width."
+  },
+  "thumbnail_width_placeholder": {
+    "message": "e.g. 100",
+    "description": "Example for thumbnail width."
+  },
+  "default_search_word": {
+    "message": "Default search word",
+    "description": "default search word."
+  },
+  "default_search_word_placeholder": {
+    "message": "e.g. thisimage",
+    "description": "Example for default search word."
+  },
+  "delete_search_word_history": {
+    "message": "Delete search word history",
+    "description": "Explanation Delete search word history button."
+  },
+  "delete": {
+    "message": "Delete",
+    "description": "Delete."
+  },
+  "custom_download_filename": {
+    "message": "Custom download filename",
+    "description": "Explanation how filename locate and rename."
+  },
+  "display_outofsearch": {
+    "message": "Display out of search with grayout",
+    "description": "Explanation display out of search row."
+  },
+  "remember_sort": {
+    "message": "Remember sort order",
+    "description": "Remember sort column and order."
+  },
+  "remember_background": {
+    "message": "Remember background color of thumbnail",
+    "description": "Remember background color of thumbnail."
+  },
+  "remove_1x1": {
+    "message": "Remove 1x1 size image",
+    "description": "Remove 1x1 size images."
+  },
+  "read_timeout": {
+    "message": "Timeout for reading (ms)",
+    "description": "Timeout for reading by ms."
+  },
+  "read_timeout_placeholder": {
+    "message": "e.g. 10000",
+    "description": "Example for timeout."
+  },
+  "back_default": {
+    "message": "Back default",
+    "description": "Back to default all options."
+  },
+  "save": {
+    "message": "Save",
+    "description": "Save options."
+  },
+  "images_in": {
+    "message": "Images in",
+    "description": "Images in page."
+  },
+  "in_css": {
+    "message": "in CSS",
+    "description": "Images in CSS."
+  }
+}

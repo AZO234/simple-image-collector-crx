@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "simple-image-collector",
   "version": "1.0.3",
-  "description": "Simple image collector.",
+  "description": "__MSG_description_sic__",
   "permissions": ["activeTab", "tabs", "contextMenus", "storage", "clipboardWrite", "downloads"],
   "action": {},
   "icons": {
@@ -10,6 +10,7 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
+  "default_locale": "en",
   "options_page": "options.html",
   "background": {
     "service_worker": "background.js"

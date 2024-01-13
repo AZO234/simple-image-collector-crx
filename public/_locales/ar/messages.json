@@ -1,0 +1,186 @@
+{
+  "description_sic": {
+    "message": "صور بسيطة لجامع الصفحة.",
+    "description": "Description of simple-image-collector."
+  },
+  "action": {
+    "message": "فعل",
+    "description": "Actions for selected images."
+  },
+  "action_popover": {
+    "message": "إجراءات للصور المحددة.",
+    "description": "popover for Action button."
+  },
+  "download": {
+    "message": "تحميل",
+    "description": "Download selected images."
+  },
+  "download_popover": {
+    "message": "قم بتنزيل الصور المختارة.",
+    "description": "popover for Download button."
+  },
+  "copy": {
+    "message": "ينسخ",
+    "description": "Copy URLs of selected images."
+  },
+  "copy_popover": {
+    "message": "انسخ عناوين URL للصور المحددة.",
+    "description": "popover for Copy button."
+  },
+  "send_to_aria2": {
+    "message": "Aria2 أرسل إلى",
+    "description": "Download selected images with Aria2."
+  },
+  "send_to_aria2_popover": {
+    "message": "قم بتنزيل الصور المحددة باستخدام Aria2.",
+    "description": "popover for Send to Aria2 button."
+  },
+  "clear": {
+    "message": "واضح",
+    "description": "Clear all images selection."
+  },
+  "clear_popover": {
+    "message": "مسح كل اختيار الصور.",
+    "description": "popover for Clear button."
+  },
+  "search": {
+    "message": "يبحث",
+    "description": "Search for inside list."
+  },
+  "search_popover": {
+    "message": "بحث (مع /.../ إلى RegExp)<br>لحفظ السجل، اضغط على زر الإدخال.",
+    "description": "popover for Search."
+  },
+  "checker": {
+    "message": "متقلب",
+    "description": "Checker for background of thumbnail."
+  },
+  "color": {
+    "message": "لون",
+    "description": "Color for background of thumbnail."
+  },
+  "background_popover": {
+    "message": "لون خلفية الصورة المصغرة.",
+    "description": "popover for background selection."
+  },
+  "options_popover": {
+    "message": "فتح صفحة الخيارات.",
+    "description": "popover for Options button."
+  },
+  "page_top_popover": {
+    "message": "انتقل إلى أعلى الصفحة.",
+    "description": "popover for Page top button."
+  },
+  "page_bottom_popover": {
+    "message": "انتقل إلى أسفل الصفحة.",
+    "description": "popover for Page bottom button."
+  },
+  "th_index": {
+    "message": "رقم",
+    "description": "table header for index."
+  },
+  "th_check": {
+    "message": "يفحص",
+    "description": "table header for Check."
+  },
+  "th_tag": {
+    "message": "بطاقة شعار",
+    "description": "table header for Tag."
+  },
+  "th_type": {
+    "message": "يكتب",
+    "description": "table header for Type."
+  },
+  "th_mime": {
+    "message": "MIME",
+    "description": "table header for MIME type."
+  },
+  "th_url_info": {
+    "message": "عنوان URL والمعلومات",
+    "description": "table header for URL & Information."
+  },
+  "img_ext_pattern": {
+    "message": "نمط الامتداد كصورة (تنسيق RegExp)",
+    "description": "Explanation ext RegExp pattern as image."
+  },
+  "img_ext_pattern_placeholder": {
+    "message": "مثال /\\.(jpg|jpeg)$/",
+    "description": "Example for ext pattern."
+  },
+  "sic_options": {
+    "message": "simple-image-collector خيارات",
+    "description": "simple-image-collector options title."
+  },
+  "get_atoimg": {
+    "message": "احصل على atoimg (رابط الصورة خارج الصفحات)",
+    "description": "Explanation getting atoimg option."
+  },
+  "thumbnail_width": {
+    "message": "عرض الصورة المصغرة",
+    "description": "thumbnail width."
+  },
+  "thumbnail_width_placeholder": {
+    "message": "مثال 100",
+    "description": "Example for thumbnail width."
+  },
+  "default_search_word": {
+    "message": "كلمة البحث الافتراضية",
+    "description": "default search word."
+  },
+  "default_search_word_placeholder": {
+    "message": "thisimage مثال",
+    "description": "Example for default search word."
+  },
+  "delete_search_word_history": {
+    "message": "حذف سجل كلمات البحث",
+    "description": "Explanation Delete search word history button."
+  },
+  "delete": {
+    "message": "يمسح",
+    "description": "Delete."
+  },
+  "custom_download_filename": {
+    "message": "اسم ملف التحميل المخصص",
+    "description": "Explanation how filename locate and rename."
+  },
+  "display_outofsearch": {
+    "message": "عرض خارج البحث باللون الرمادي",
+    "description": "Explanation display out of search row."
+  },
+  "remember_sort": {
+    "message": "تذكر ترتيب الفرز",
+    "description": "Remember sort column and order."
+  },
+  "remember_background": {
+    "message": "تذكر لون خلفية الصورة المصغرة",
+    "description": "Remember background color of thumbnail."
+  },
+  "remove_1x1": {
+    "message": "1x1 قم بإزالة الصورة بحجم",
+    "description": "Remove 1x1 size images."
+  },
+  "read_timeout": {
+    "message": "مهلة القراءة (مللي ثانية)",
+    "description": "Timeout for reading by ms."
+  },
+  "read_timeout_placeholder": {
+    "message": "مثال 10000",
+    "description": "Example for timeout."
+  },
+  "back_default": {
+    "message": "العودة الافتراضية",
+    "description": "Back to default all options."
+  },
+  "save": {
+    "message": "يحفظ",
+    "description": "Save options."
+  },
+  "images_in": {
+    "message": "الصور في",
+    "description": "Images in page."
+  },
+  "in_css": {
+    "message": "في CSS",
+    "description": "Images in CSS."
+  }
+}
