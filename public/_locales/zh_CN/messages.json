@@ -167,6 +167,22 @@
     "message": "示例 10000",
     "description": "Example for timeout."
   },
+  "a2_download_dir": {
+    "message": "(Aria2) 下载目录",
+    "description": "Download directory for Aria2."
+  },
+  "default": {
+    "message": "默认",
+    "description": "Default."
+  },
+  "a2_if_url": {
+    "message": "(Aria2) 接口地址",
+    "description": "Interface URL of Aria2."
+  },
+  "a2_add_title": {
+    "message": "(Aria2) 将页面标题添加到下载目录",
+    "description": "Add page title to download directory name for Aria2."
+  },
   "back_default": {
     "message": "返回默认值",
     "description": "Back to default all options."

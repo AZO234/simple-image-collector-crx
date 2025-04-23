@@ -1,94 +1,94 @@
 {
   "description_sic": {
-    "message": "صور بسيطة لجامع الصفحة.",
+    "message": "पेज कलेक्टर की सरल छवियाँ।",
     "description": "Description of simple-image-collector."
   },
   "action": {
-    "message": "فعل",
+    "message": "कार्रवाई",
     "description": "Actions for selected images."
   },
   "action_popover": {
-    "message": "إجراءات للصور المحددة.",
+    "message": "चयनित छवियों के लिए क्रियाएँ.",
     "description": "popover for Action button."
   },
   "download": {
-    "message": "تحميل",
+    "message": "डाउनलोड करना",
     "description": "Download selected images."
   },
   "download_popover": {
-    "message": "قم بتنزيل الصور المختارة.",
+    "message": "चुनिंदा छवियाँ डाउनलोड करें.",
     "description": "popover for Download button."
   },
   "copy": {
-    "message": "ينسخ",
+    "message": "प्रतिलिपि",
     "description": "Copy URLs of selected images."
   },
   "copy_popover": {
-    "message": "انسخ عناوين URL للصور المحددة.",
+    "message": "चयनित छवियों के यूआरएल कॉपी करें।",
     "description": "popover for Copy button."
   },
   "send_to_aria2": {
-    "message": "Aria2 أرسل إلى",
+    "message": "Aria2 को भेजें",
     "description": "Download selected images with Aria2."
   },
   "send_to_aria2_popover": {
-    "message": "قم بتنزيل الصور المحددة باستخدام Aria2.",
+    "message": "Aria2 के साथ चयनित छवियाँ डाउनलोड करें।",
     "description": "popover for Send to Aria2 button."
   },
   "clear": {
-    "message": "واضح",
+    "message": "स्पष्ट",
     "description": "Clear all images selection."
   },
   "clear_popover": {
-    "message": "مسح كل اختيار الصور.",
+    "message": "सभी छवियों का चयन साफ़ करें.",
     "description": "popover for Clear button."
   },
   "search": {
-    "message": "يبحث",
+    "message": "खोज",
     "description": "Search for inside list."
   },
   "search_popover": {
-    "message": "بحث (مع /.../ إلى RegExp)<br>لحفظ السجل، اضغط على زر الإدخال.",
+    "message": "खोजें (/.../ से RegExp के साथ)<br>इतिहास सहेजने के लिए, एंटर दबाएं।",
     "description": "popover for Search."
   },
   "checker": {
-    "message": "متقلب",
+    "message": "चेकर",
     "description": "Checker for background of thumbnail."
   },
   "color": {
-    "message": "لون",
+    "message": "रंग",
     "description": "Color for background of thumbnail."
   },
   "background_popover": {
-    "message": "لون خلفية الصورة المصغرة.",
+    "message": "थंबनेल का पृष्ठभूमि रंग.",
     "description": "popover for background selection."
   },
   "options_popover": {
-    "message": "فتح صفحة الخيارات.",
+    "message": "विकल्प पृष्ठ खोलें.",
     "description": "popover for Options button."
   },
   "page_top_popover": {
-    "message": "انتقل إلى أعلى الصفحة.",
+    "message": "पृष्ठ शीर्ष पर जाएँ.",
     "description": "popover for Page top button."
   },
   "page_bottom_popover": {
-    "message": "انتقل إلى أسفل الصفحة.",
+    "message": "पृष्ठ के निचले भाग पर जाएँ.",
     "description": "popover for Page bottom button."
   },
   "th_index": {
-    "message": "رقم",
+    "message": "संख्या",
     "description": "table header for index."
   },
   "th_check": {
-    "message": "يفحص",
+    "message": "जाँच करना",
     "description": "table header for Check."
   },
   "th_tag": {
-    "message": "بطاقة شعار",
+    "message": "टैग",
     "description": "table header for Tag."
   },
   "th_type": {
-    "message": "يكتب",
+    "message": "प्रकार",
     "description": "table header for Type."
   },
   "th_mime": {
@@ -96,107 +96,107 @@
     "description": "table header for MIME type."
   },
   "th_url_info": {
-    "message": "عنوان URL والمعلومات",
+    "message": "यूआरएल और जानकारी",
     "description": "table header for URL & Information."
   },
   "img_ext_pattern": {
-    "message": "نمط الامتداد كصورة (تنسيق RegExp)",
+    "message": "छवि के रूप में विस्तारित पैटर्न (RegExp प्रारूप)",
     "description": "Explanation ext RegExp pattern as image."
   },
   "img_ext_pattern_placeholder": {
-    "message": "مثال /\\.(jpg|jpeg)$/",
+    "message": "उदाहरण /\\.(jpg|jpeg)$/",
     "description": "Example for ext pattern."
   },
   "sic_options": {
-    "message": "simple-image-collector خيارات",
+    "message": "simple-image-collector विकल्प",
     "description": "simple-image-collector options title."
   },
   "get_atoimg": {
-    "message": "احصل على atoimg (رابط الصورة خارج الصفحات)",
+    "message": "atoimg प्राप्त करें (पृष्ठों से बाहर छवि लिंक)",
     "description": "Explanation getting atoimg option."
   },
   "thumbnail_width": {
-    "message": "عرض الصورة المصغرة",
+    "message": "थंबनेल की चौड़ाई",
     "description": "thumbnail width."
   },
   "thumbnail_width_placeholder": {
-    "message": "مثال 100",
+    "message": "उदाहरण 100",
     "description": "Example for thumbnail width."
   },
   "default_search_word": {
-    "message": "كلمة البحث الافتراضية",
+    "message": "डिफ़ॉल्ट खोज शब्द",
     "description": "default search word."
   },
   "default_search_word_placeholder": {
-    "message": "thisimage مثال",
+    "message": "उदाहरण thisimage",
     "description": "Example for default search word."
   },
   "delete_search_word_history": {
-    "message": "حذف سجل كلمات البحث",
+    "message": "खोज शब्द इतिहास हटाएँ",
     "description": "Explanation Delete search word history button."
   },
   "delete": {
-    "message": "يمسح",
+    "message": "मिटाना",
     "description": "Delete."
   },
   "custom_download_filename": {
-    "message": "اسم ملف التحميل المخصص",
+    "message": "कस्टम डाउनलोड फ़ाइल नाम",
     "description": "Explanation how filename locate and rename."
   },
   "display_outofsearch": {
-    "message": "عرض خارج البحث باللون الرمادي",
+    "message": "ग्रेआउट के साथ खोज से बाहर प्रदर्शित करें",
     "description": "Explanation display out of search row."
   },
   "remember_sort": {
-    "message": "تذكر ترتيب الفرز",
+    "message": "क्रमबद्ध क्रम याद रखें",
     "description": "Remember sort column and order."
   },
   "remember_background": {
-    "message": "تذكر لون خلفية الصورة المصغرة",
+    "message": "थंबनेल का पृष्ठभूमि रंग याद रखें",
     "description": "Remember background color of thumbnail."
   },
   "remove_1x1": {
-    "message": "1x1 قم بإزالة الصورة بحجم",
+    "message": "1x1 आकार की छवि निकालें",
     "description": "Remove 1x1 size images."
   },
   "read_timeout": {
-    "message": "مهلة القراءة (مللي ثانية)",
+    "message": "पढ़ने के लिए समयबाह्य (ms)",
     "description": "Timeout for reading by ms."
   },
   "read_timeout_placeholder": {
-    "message": "مثال 10000",
+    "message": "उदाहरण 10000",
     "description": "Example for timeout."
   },
   "a2_download_dir": {
-    "message": "(Aria2) تحميل الدليل",
+    "message": "(Aria2) निर्देशिका डाउनलोड करें",
     "description": "Download directory for Aria2."
   },
   "default": {
-    "message": "تقصير",
+    "message": "गलती करना",
     "description": "Default."
   },
   "a2_if_url": {
-    "message": "(Aria2) عنوان URL للواجهة",
+    "message": "(Aria2) इंटरफ़ेस यूआरएल",
     "description": "Interface URL of Aria2."
   },
   "a2_add_title": {
-    "message": "(Aria2) أضف عنوان الصفحة إلى اسم دليل التنزيل",
+    "message": "(Aria2) डाउनलोड निर्देशिका में पृष्ठ शीर्षक जोड़ें",
     "description": "Add page title to download directory name for Aria2."
   },
   "back_default": {
-    "message": "العودة الافتراضية",
+    "message": "वापस डिफ़ॉल्ट",
     "description": "Back to default all options."
   },
   "save": {
-    "message": "يحفظ",
+    "message": "बचाना",
     "description": "Save options."
   },
   "images_in": {
-    "message": "الصور في",
+    "message": "में छवियाँ",
     "description": "Images in page."
   },
   "in_css": {
-    "message": "في CSS",
+    "message": "में CSS",
     "description": "Images in CSS."
   }
 }

@@ -13,7 +13,10 @@ const sicDefOptionsImgList: sicOptions = {
   bgChecker: true,
   bgColor: '#FFFFFF',
   remove1x1: true,
-  rTimeout: 10000
+  rTimeout: 10000,
+  a2IfUrl: 'http://localhost:6800/jsonrpc',
+  a2DlDir: '',
+  a2AddTitle: false
 };
 const sicOptionsImgList: sicOptions = Object.assign(sicDefOptionsImgList);
 
@@ -33,7 +36,10 @@ function convertOptionsToStorageImgList(options: sicOptions): sicStorageOptions 
     bBgChecker: options.bgChecker.toString(),
     clrBgColor: options.bgColor,
     bRemove1x1: options.remove1x1.toString(),
-    nmbRTimeout: options.rTimeout.toString()
+    nmbRTimeout: options.rTimeout.toString(),
+    txtA2IfUrl: options.a2IfUrl,
+    txtA2DlDir: options.a2DlDir.replace(/(\\|\/)$/, ''),
+    bA2AddTitle: options.a2AddTitle.toString()
   };
 }
 
@@ -54,6 +60,9 @@ function loadOptionsImgList() {
     sicOptionsImgList.bgColor = result['clrBgColor'];
     sicOptionsImgList.remove1x1 = result['bRemove1x1'] === 'true';
     sicOptionsImgList.rTimeout = Number(result['nmbRTimeout']);
+    sicOptionsImgList.a2IfUrl = result['txtA2IfUrl'];
+    sicOptionsImgList.a2DlDir = result['txtA2DlDir'].replace(/(\\|\/)$/, '');
+    sicOptionsImgList.a2AddTitle = (result['bA2AddTitle'] === 'true' && sicOptionsImgList.a2DlDir !== '');
   });
 
   const history = <HTMLDataListElement>document.getElementById('history');
@@ -878,22 +887,46 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   btnSendToAria2.addEventListener('click', function () {
-    const proms: Promise<any>[] = [];
-
-    const datetime = getDLDatatime();
+    const adduris = [];
 
     for(const item of sicItemsImgList) {
       if((item.check & 0b110) && (item.check & 0b001) && item.tag !== 'SVG') {
         if(item.image) {
-          proms.push(chrome.runtime.sendMessage('mpkodccbngfoacfalldjimigbofkhgjn', { 
-            url: item.url,
-            filename: getDLFilename(datetime, item)
-          }));
+          if(sicOptionsImgList.a2DlDir !== '') {
+            let dir = sicOptionsImgList.a2DlDir;
+            if(sicOptionsImgList.a2AddTitle) {
+              dir += '/' + document.title.replace(/^sic:/, '').replace(/[<>:"\/\\|?*\x00-\x1F]/g, '_');
+            }
+            adduris.push({
+              'methodName': 'aria2.addUri',
+              params: [[item.image.url], {dir: dir}]
+            });
+          } else {
+            adduris.push({
+              'methodName': 'aria2.addUri',
+              params: [[item.image.url]]
+            });
+          }
         }
       }
     }
-    Promise.all(proms);
-  });
+    if(sicOptionsImgList.a2IfUrl !== '' && adduris.length > 0) {
+      (async () => {
+        await fetch(sicOptionsImgList.a2IfUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            method: 'system.multicall',
+            id: crypto.randomUUID(),
+            params: [adduris]
+          })
+        });
+      })();
+    }
+});
 
   btnClear.addEventListener('click', function () {
     for(const item of sicItemsImgList) {

@@ -14,6 +14,9 @@ interface sicOptions {
   bgColor: string;
   remove1x1: boolean;
   rTimeout: number;
+  a2IfUrl: string;
+  a2DlDir: string;
+  a2AddTitle: boolean;
 }
 
 const sicDefOptions: sicOptions = {
@@ -31,7 +34,10 @@ const sicDefOptions: sicOptions = {
   bgChecker: true,
   bgColor: '#FFFFFF',
   remove1x1: true,
-  rTimeout: 10000
+  rTimeout: 10000,
+  a2IfUrl: 'http://localhost:6800/jsonrpc',
+  a2DlDir: '',
+  a2AddTitle: false
 };
 const sicOptions: sicOptions = Object.assign(sicDefOptions);
 
@@ -51,6 +57,9 @@ interface sicStorageOptions {
   clrBgColor: string;
   bRemove1x1: string;
   nmbRTimeout: string;
+  txtA2IfUrl: string;
+  txtA2DlDir: string;
+  bA2AddTitle: string;
 }
 
 function convertOptionsToStorage(options: sicOptions): sicStorageOptions {
@@ -69,7 +78,10 @@ function convertOptionsToStorage(options: sicOptions): sicStorageOptions {
     bBgChecker: options.bgChecker.toString(),
     clrBgColor: options.bgColor,
     bRemove1x1: options.remove1x1.toString(),
-    nmbRTimeout: options.rTimeout.toString()
+    nmbRTimeout: options.rTimeout.toString(),
+    txtA2IfUrl: options.a2IfUrl,
+    txtA2DlDir: options.a2DlDir,
+    bA2AddTitle: options.a2AddTitle.toString()
   };
 }
 

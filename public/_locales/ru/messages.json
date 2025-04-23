@@ -167,6 +167,22 @@
     "message": "пример 10000",
     "description": "Example for timeout."
   },
+  "a2_if_url": {
+    "message": "(Aria2) URL-адрес интерфейса",
+    "description": "Interface URL of Aria2."
+  },
+  "a2_download_dir": {
+    "message": "(Aria2) Скачать каталог",
+    "description": "Download directory for Aria2."
+  },
+  "default": {
+    "message": "По умолчанию",
+    "description": "Default."
+  },
+  "a2_add_title": {
+    "message": "(Aria2) Добавить заголовок страницы в каталог загрузок",
+    "description": "Add page title to download directory name for Aria2."
+  },
   "back_default": {
     "message": "Назад по умолчанию",
     "description": "Back to default all options."

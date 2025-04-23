@@ -167,6 +167,22 @@
     "message": "e.g. 10000",
     "description": "Example for timeout."
   },
+  "a2_if_url": {
+    "message": "(Aria2) Interface URL",
+    "description": "Interface URL of Aria2."
+  },
+  "a2_download_dir": {
+    "message": "(Aria2) Download directory",
+    "description": "Download directory for Aria2."
+  },
+  "default": {
+    "message": "Default",
+    "description": "Default."
+  },
+  "a2_add_title": {
+    "message": "(Aria2) Add page title to download directory",
+    "description": "Add page title to download directory name for Aria2."
+  },
   "back_default": {
     "message": "Back default",
     "description": "Back to default all options."
