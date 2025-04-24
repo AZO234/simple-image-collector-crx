@@ -179,10 +179,6 @@
     "message": "(Aria2) इंटरफ़ेस यूआरएल",
     "description": "Interface URL of Aria2."
   },
-  "a2_add_title": {
-    "message": "(Aria2) डाउनलोड निर्देशिका में पृष्ठ शीर्षक जोड़ें",
-    "description": "Add page title to download directory name for Aria2."
-  },
   "back_default": {
     "message": "वापस डिफ़ॉल्ट",
     "description": "Back to default all options."

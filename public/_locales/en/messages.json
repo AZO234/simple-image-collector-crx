@@ -179,10 +179,6 @@
     "message": "Default",
     "description": "Default."
   },
-  "a2_add_title": {
-    "message": "(Aria2) Add page title to download directory",
-    "description": "Add page title to download directory name for Aria2."
-  },
   "back_default": {
     "message": "Back default",
     "description": "Back to default all options."

@@ -15,8 +15,7 @@ const sicDefOptionsImgList: sicOptions = {
   remove1x1: true,
   rTimeout: 10000,
   a2IfUrl: 'http://localhost:6800/jsonrpc',
-  a2DlDir: '',
-  a2AddTitle: false
+  a2DlDir: ''
 };
 const sicOptionsImgList: sicOptions = Object.assign(sicDefOptionsImgList);
 
@@ -38,8 +37,7 @@ function convertOptionsToStorageImgList(options: sicOptions): sicStorageOptions 
     bRemove1x1: options.remove1x1.toString(),
     nmbRTimeout: options.rTimeout.toString(),
     txtA2IfUrl: options.a2IfUrl,
-    txtA2DlDir: options.a2DlDir.replace(/(\\|\/)$/, ''),
-    bA2AddTitle: options.a2AddTitle.toString()
+    txtA2DlDir: options.a2DlDir.replace(/(\\|\/)$/, '')
   };
 }
 
@@ -62,7 +60,6 @@ function loadOptionsImgList() {
     sicOptionsImgList.rTimeout = Number(result['nmbRTimeout']);
     sicOptionsImgList.a2IfUrl = result['txtA2IfUrl'];
     sicOptionsImgList.a2DlDir = result['txtA2DlDir'].replace(/(\\|\/)$/, '');
-    sicOptionsImgList.a2AddTitle = (result['bA2AddTitle'] === 'true' && sicOptionsImgList.a2DlDir !== '');
   });
 
   const history = <HTMLDataListElement>document.getElementById('history');
@@ -798,19 +795,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let dlpath = '';
   
     if(item.image) {
-      const filename = (item.image.url.match(/\/([^\/\?#&]+)(?:\?|#|&|$)/) || [])[1] || '';
+      const filename = ((item.image.url.match(/\/([^\/\?#&]+)(?:\?|#|&|$)/) || [])[1] || '').trim();
       if(filename === '') {
         return '';
       }
-      let ext = (filename.match(/\.([^.]*?)$/) || [])[1] || '';
+      let ext = ((filename.match(/\.([^.]*?)$/) || [])[1] || '').trim();
       if(ext === '') {
         if(item.image.mime !== '') {
-          ext = (item.image.mime.match(/\/(.*?)$/) || [])[1] || '';
+          ext = ((item.image.mime.match(/\/(.*?)$/) || [])[1] || '').trim();
         }
       }
-      const pp = decodeURIComponent((pageurl.match(/\/([^\/\?]+)(\/|\?[^\/\?]*?|\/\?[^\/\?]*?)?$/) || [])[1] || '');
-      const pu = pageurl.replace(/:\/\//, '_').replace(/[<>:"\\|?*\x00-\x1F]/g, '_');
-      const pt = pagetitle.replace(/[<>:"\/\\|?*\x00-\x1F]/g, '_');
+      const pp = decodeURIComponent((pageurl.match(/\/([^\/\?]+)(\/|\?[^\/\?]*?|\/\?[^\/\?]*?)?$/) || [])[1] || '').trim();
+      const pu = pageurl.replace(/:\/\//, '_').replace(/[<>:'"\\|?*\x00-\x1F]/g, '_').trim();
+      const pt = pagetitle.replace(/[<>:'"\/\\|?*\x00-\x1F]/g, '_').trim();
   
       dlpath = filename;
       switch(sicOptionsImgList.dlFilenameType) {
@@ -845,28 +842,21 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   btnDownload.addEventListener('click', function () {
-    const proms: Promise<number>[] = [];
-
     const datetime = getDLDatatime();
 
     for(const item of sicItemsImgList) {
       if((item.check & 0b110) && (item.check & 0b001) && item.tag !== 'SVG') {
         if(item.image) {
-          const options: chrome.downloads.DownloadOptions = {
+          chrome.downloads.download({
             filename: getDLFilename(datetime, item),
             url: item.url,
             saveAs: false
-          }
-          proms.push(chrome.downloads.download(options));
+          });
         }
       }
     }
-    for(const prom of proms) {
-      (async () => {
-        await prom;
-      })();
-    }
   });
+
 
   btnCopy.addEventListener('click', function () {
     let text = '';
@@ -887,24 +877,21 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   btnSendToAria2.addEventListener('click', function () {
+    const datetime = getDLDatatime();
     const adduris = [];
 
     for(const item of sicItemsImgList) {
       if((item.check & 0b110) && (item.check & 0b001) && item.tag !== 'SVG') {
         if(item.image) {
           if(sicOptionsImgList.a2DlDir !== '') {
-            let dir = sicOptionsImgList.a2DlDir;
-            if(sicOptionsImgList.a2AddTitle) {
-              dir += '/' + document.title.replace(/^sic:/, '').replace(/[<>:"\/\\|?*\x00-\x1F]/g, '_');
-            }
             adduris.push({
               'methodName': 'aria2.addUri',
-              params: [[item.image.url], {dir: dir}]
+              params: [[item.image.url], {out: getDLFilename(datetime, item), dir: sicOptionsImgList.a2DlDir}]
             });
           } else {
             adduris.push({
               'methodName': 'aria2.addUri',
-              params: [[item.image.url]]
+              params: [[item.image.url], {out: getDLFilename(datetime, item)}]
             });
           }
         }

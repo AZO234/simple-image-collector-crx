@@ -179,10 +179,6 @@
     "message": "(Aria2) インターフェイス URL",
     "description": "Interface URL of Aria2."
   },
-  "a2_add_title": {
-    "message": "(Aria2) ディレクトリにページタイトルを追加",
-    "description": "Add page title to download directory name for Aria2."
-  },
   "back_default": {
     "message": "デフォルトに戻す",
     "description": "Back to default all options."

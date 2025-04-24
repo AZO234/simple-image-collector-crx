@@ -15,8 +15,7 @@ const sicDefOptionsOp: sicOptions = {
   remove1x1: true,
   rTimeout: 10000,
   a2IfUrl: 'http://localhost:6800/jsonrpc',
-  a2DlDir: '',
-  a2AddTitle: false
+  a2DlDir: ''
 };
 const sicOptionsOp: sicOptions = Object.assign(sicDefOptionsOp);
 
@@ -38,8 +37,7 @@ function convertOptionsToStorageOp(options: sicOptions): sicStorageOptions {
     bRemove1x1: options.remove1x1.toString(),
     nmbRTimeout: options.rTimeout.toString(),
     txtA2IfUrl: options.a2IfUrl,
-    txtA2DlDir: options.a2DlDir.replace(/(\\|\/)$/, ''),
-    bA2AddTitle: options.a2AddTitle.toString()
+    txtA2DlDir: options.a2DlDir.replace(/(\\|\/)$/, '')
   };
 }
 
@@ -61,8 +59,7 @@ function loadOptionsToUI() {
     bRemove1x1: '',
     nmbRTimeout: '',
     txtA2IfUrl: '',
-    txtA2DlDir: '',
-    bA2AddTitle: ''
+    txtA2DlDir: ''
   }
   chrome.storage.sync.get(Object.keys(storageOptions), (result) => {
     sicOptionsOp.imgExtPattern = new RegExp(result['rxImgExtPattern']);
@@ -82,7 +79,6 @@ function loadOptionsToUI() {
     sicOptionsOp.rTimeout = Number(result['nmbRTimeout']);
     sicOptionsOp.a2IfUrl = result['txtA2IfUrl'];
     sicOptionsOp.a2DlDir = result['txtA2DlDir'].replace(/(\\|\/)$/, '');
-    sicOptionsOp.a2AddTitle = (result['bA2AddTitle'] === 'true' && sicOptionsOp.a2DlDir !== '');
 
     const txtImgExtPattern = <HTMLInputElement>document.getElementById('txtImgExtPattern');
     const chkGetAToImg = <HTMLInputElement>document.getElementById('chkGetAToImg');
@@ -104,7 +100,6 @@ function loadOptionsToUI() {
     const nmbRTimeout = <HTMLInputElement>document.getElementById('nmbRTimeout');
     const txtA2IfUrl = <HTMLInputElement>document.getElementById('txtA2IfUrl');
     const txtA2DlDir = <HTMLInputElement>document.getElementById('txtA2DlDir');
-    const chkA2AddTitle = <HTMLInputElement>document.getElementById('chkA2AddTitle');
   
     txtImgExtPattern.value = sicOptionsOp.imgExtPattern.source;
     chkGetAToImg.checked = sicOptionsOp.getAToImg;
@@ -146,7 +141,6 @@ function loadOptionsToUI() {
     nmbRTimeout.value = sicOptionsOp.rTimeout.toString();
     txtA2IfUrl.value = sicOptionsOp.a2IfUrl;
     txtA2DlDir.value = sicOptionsOp.a2DlDir;
-    chkA2AddTitle.checked = sicOptionsOp.a2AddTitle;
   });
 }
 
@@ -171,7 +165,6 @@ function saveOptionsFromUI() {
   const nmbRTimeout = <HTMLInputElement>document.getElementById('nmbRTimeout');
   const txtA2IfUrl = <HTMLInputElement>document.getElementById('txtA2IfUrl');
   const txtA2DlDir = <HTMLInputElement>document.getElementById('txtA2DlDir');
-  const chkA2AddTitle = <HTMLInputElement>document.getElementById('chkA2AddTitle');
 
   // Ext pattern as image
   const m = txtImgExtPattern.value.match(/^\/(.*)\/(.*)$/) || [];
@@ -251,9 +244,6 @@ function saveOptionsFromUI() {
 
   // Download directory for Aria2
   sicOptionsOp.a2DlDir = txtA2DlDir.value.replace(/(\\|\/)$/, '');
-
-  // Add page title to download directory name for Aria2
-  sicOptionsOp.a2AddTitle = (chkA2AddTitle.checked && sicOptionsOp.a2DlDir !== '');
 
   (async () => {
     await chrome.runtime.sendMessage({

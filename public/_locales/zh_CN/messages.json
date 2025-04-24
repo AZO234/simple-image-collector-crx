@@ -179,10 +179,6 @@
     "message": "(Aria2) 接口地址",
     "description": "Interface URL of Aria2."
   },
-  "a2_add_title": {
-    "message": "(Aria2) 将页面标题添加到下载目录",
-    "description": "Add page title to download directory name for Aria2."
-  },
   "back_default": {
     "message": "返回默认值",
     "description": "Back to default all options."
