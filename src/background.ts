@@ -15,7 +15,8 @@ interface sicOptions {
   remove1x1: boolean;
   rTimeout: number;
   a2IfUrl: string;
-  a2DlDir: string;
+  a2DlDirW: string;
+  a2DlDirP: string;
 }
 
 const sicDefOptions: sicOptions = {
@@ -35,7 +36,8 @@ const sicDefOptions: sicOptions = {
   remove1x1: true,
   rTimeout: 10000,
   a2IfUrl: 'http://localhost:6800/jsonrpc',
-  a2DlDir: ''
+  a2DlDirW: '',
+  a2DlDirP: ''
 };
 const sicOptions: sicOptions = Object.assign(sicDefOptions);
 
@@ -56,7 +58,8 @@ interface sicStorageOptions {
   bRemove1x1: string;
   nmbRTimeout: string;
   txtA2IfUrl: string;
-  txtA2DlDir: string;
+  txtA2DlDirW: string;
+  txtA2DlDirP: string;
 }
 
 function convertOptionsToStorage(options: sicOptions): sicStorageOptions {
@@ -77,7 +80,8 @@ function convertOptionsToStorage(options: sicOptions): sicStorageOptions {
     bRemove1x1: options.remove1x1.toString(),
     nmbRTimeout: options.rTimeout.toString(),
     txtA2IfUrl: options.a2IfUrl,
-    txtA2DlDir: options.a2DlDir
+    txtA2DlDirW: options.a2DlDirW,
+    txtA2DlDirP: options.a2DlDirP
   };
 }
 

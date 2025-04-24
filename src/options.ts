@@ -15,7 +15,8 @@ const sicDefOptionsOp: sicOptions = {
   remove1x1: true,
   rTimeout: 10000,
   a2IfUrl: 'http://localhost:6800/jsonrpc',
-  a2DlDir: ''
+  a2DlDirW: '',
+  a2DlDirP: ''
 };
 const sicOptionsOp: sicOptions = Object.assign(sicDefOptionsOp);
 
@@ -37,7 +38,8 @@ function convertOptionsToStorageOp(options: sicOptions): sicStorageOptions {
     bRemove1x1: options.remove1x1.toString(),
     nmbRTimeout: options.rTimeout.toString(),
     txtA2IfUrl: options.a2IfUrl,
-    txtA2DlDir: options.a2DlDir.replace(/(\\|\/)$/, '')
+    txtA2DlDirW: options.a2DlDirW.replace(/(\\|\/)$/, ''),
+    txtA2DlDirP: options.a2DlDirP.replace(/(\\|\/)$/, '')
   };
 }
 
@@ -59,7 +61,8 @@ function loadOptionsToUI() {
     bRemove1x1: '',
     nmbRTimeout: '',
     txtA2IfUrl: '',
-    txtA2DlDir: ''
+    txtA2DlDirW: '',
+    txtA2DlDirP: ''
   }
   chrome.storage.sync.get(Object.keys(storageOptions), (result) => {
     sicOptionsOp.imgExtPattern = new RegExp(result['rxImgExtPattern']);
@@ -78,7 +81,8 @@ function loadOptionsToUI() {
     sicOptionsOp.remove1x1 = result['bRemove1x1'] === 'true';
     sicOptionsOp.rTimeout = Number(result['nmbRTimeout']);
     sicOptionsOp.a2IfUrl = result['txtA2IfUrl'];
-    sicOptionsOp.a2DlDir = result['txtA2DlDir'].replace(/(\\|\/)$/, '');
+    sicOptionsOp.a2DlDirW = result['txtA2DlDirW'].replace(/(\\|\/)$/, '');
+    sicOptionsOp.a2DlDirP = result['txtA2DlDirP'].replace(/(\\|\/)$/, '');
 
     const txtImgExtPattern = <HTMLInputElement>document.getElementById('txtImgExtPattern');
     const chkGetAToImg = <HTMLInputElement>document.getElementById('chkGetAToImg');
@@ -99,7 +103,8 @@ function loadOptionsToUI() {
     const chkRemove1x1 = <HTMLInputElement>document.getElementById('chkRemove1x1');
     const nmbRTimeout = <HTMLInputElement>document.getElementById('nmbRTimeout');
     const txtA2IfUrl = <HTMLInputElement>document.getElementById('txtA2IfUrl');
-    const txtA2DlDir = <HTMLInputElement>document.getElementById('txtA2DlDir');
+    const txtA2DlDirW = <HTMLInputElement>document.getElementById('txtA2DlDirW');
+    const txtA2DlDirP = <HTMLInputElement>document.getElementById('txtA2DlDirP');
   
     txtImgExtPattern.value = sicOptionsOp.imgExtPattern.source;
     chkGetAToImg.checked = sicOptionsOp.getAToImg;
@@ -140,7 +145,8 @@ function loadOptionsToUI() {
     chkRemove1x1.checked = sicOptionsOp.remove1x1;
     nmbRTimeout.value = sicOptionsOp.rTimeout.toString();
     txtA2IfUrl.value = sicOptionsOp.a2IfUrl;
-    txtA2DlDir.value = sicOptionsOp.a2DlDir;
+    txtA2DlDirW.value = sicOptionsOp.a2DlDirW;
+    txtA2DlDirP.value = sicOptionsOp.a2DlDirP;
   });
 }
 
@@ -164,7 +170,8 @@ function saveOptionsFromUI() {
   const chkRemove1x1 = <HTMLInputElement>document.getElementById('chkRemove1x1');
   const nmbRTimeout = <HTMLInputElement>document.getElementById('nmbRTimeout');
   const txtA2IfUrl = <HTMLInputElement>document.getElementById('txtA2IfUrl');
-  const txtA2DlDir = <HTMLInputElement>document.getElementById('txtA2DlDir');
+  const txtA2DlDirW = <HTMLInputElement>document.getElementById('txtA2DlDirW');
+  const txtA2DlDirP = <HTMLInputElement>document.getElementById('txtA2DlDirP');
 
   // Ext pattern as image
   const m = txtImgExtPattern.value.match(/^\/(.*)\/(.*)$/) || [];
@@ -242,8 +249,11 @@ function saveOptionsFromUI() {
   // Interface URL of Aria2
   sicOptionsOp.a2IfUrl = txtA2IfUrl.value;
 
-  // Download directory for Aria2
-  sicOptionsOp.a2DlDir = txtA2DlDir.value.replace(/(\\|\/)$/, '');
+  // Download directory for Aria2 (Windows)
+  sicOptionsOp.a2DlDirW = txtA2DlDirW.value.replace(/(\\|\/)$/, '');
+
+  // Download directory for Aria2 (Posix)
+  sicOptionsOp.a2DlDirP = txtA2DlDirP.value.replace(/(\\|\/)$/, '');
 
   (async () => {
     await chrome.runtime.sendMessage({
