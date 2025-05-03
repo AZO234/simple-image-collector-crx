@@ -296,6 +296,13 @@ function updateSelectedCount() {
   const nmbSelectedCount = <HTMLSpanElement>document.getElementById('nmbSelectedCount');
   const btnClear = <HTMLButtonElement>document.getElementById('btnClear');
 
+  selectedCount = 0;
+  for(const item of sicItemsImgList) {
+    if((item.check & 0b110) && (item.check & 0b001)) {
+      selectedCount++;
+    }
+  }
+
   if(selectedCount) {
     nmbSelectedCount.style.display = 'inline-block';
     nmbSelectedCount.textContent = selectedCount.toString();
@@ -342,9 +349,6 @@ function updateRow(item: sicItem) {
       row.style.display = 'none';
     }
   }
-  if((item.check & 0b110) && (item.check & 0b001)) {
-    selectedCount++;
-  };
   
   // column: Tag
   cols[2].textContent = item.tag;
@@ -530,9 +534,6 @@ function addRow(item: sicItem) {
       const row = <HTMLTableRowElement>col.parentElement;
       const index = Number(row.id.replace(/row_(\d+$)/, "$1"));
       const item = getItemFromIndex(index);
-      if((item.check & 0b110) && (item.check & 0b001)) {
-        selectedCount--;
-      }
       item.check ^= 0b010;
       updateRow(item);
       updateSelectedCount();
@@ -615,8 +616,6 @@ function addRow(item: sicItem) {
 function updateTable() {
   const tableBody = document.getElementById('table-body');
 
-  selectedCount = 0;
-
   if(tableBody) {
     tableBody.innerHTML = '';
     for(const item of sicItemsImgList) {
@@ -634,7 +633,6 @@ function idClick(item: sicItem) {
     indeterminateIndex[0] = item.index;
     item.check |= 0b100;
     updateRow(item);
-    updateSelectedCount();
   } else {
     let i = 0;
     if(indeterminateIndex[1] < 0) {
@@ -642,8 +640,6 @@ function idClick(item: sicItem) {
       if(indeterminateIndex[0] === item.index) {
         indeterminateIndex = [-1, -1];
         item.check &= 0b011;
-        updateRow(item);
-        updateSelectedCount();
       // indeterminate select between start and end
       } else {
         let state = 0;
@@ -680,7 +676,6 @@ function idClick(item: sicItem) {
           item.check |= 0b100;
         }
         updateRow(item);
-        updateSelectedCount();
       // cancel indeterminate select all
       } else {
         indeterminateIndex = [-1, -1];
@@ -691,6 +686,7 @@ function idClick(item: sicItem) {
       }
     }
   }
+  updateSelectedCount();
 }
 
 // Handle table header click
@@ -930,6 +926,7 @@ document.addEventListener('DOMContentLoaded', () => {
     for(const item of sicItemsImgList) {
       item.check &= 0b001;
     }
+    indeterminateIndex = [-1, -1];
     updateTable();
   });
 
