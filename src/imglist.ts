@@ -640,6 +640,7 @@ function idClick(item: sicItem) {
       if(indeterminateIndex[0] === item.index) {
         indeterminateIndex = [-1, -1];
         item.check &= 0b011;
+        updateRow(item);
       // indeterminate select between start and end
       } else {
         let state = 0;
