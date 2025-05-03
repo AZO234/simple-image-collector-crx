@@ -15,13 +15,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm
+          cache: npm
 
       - name: Install Dependencies
-        run: pnpm install
+        run: npm install
 
       - name: Build
-        run: pnpm run build
+        run: npm run build
 
       - name: Set repository name
         run: echo "REPOSITORY_NAME=${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}" >> $GITHUB_ENV
