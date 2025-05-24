@@ -23,5 +23,10 @@
       "matches": ["*://*/*"],
       "js": ["content.js"]
     }
-  ]
+  ],
+  "applications": {
+    "gecko": {
+      "id": "simple-image-collector@github.com"
+    }
+  }
 }
