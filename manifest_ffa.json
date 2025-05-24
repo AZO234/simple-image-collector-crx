@@ -1,0 +1,27 @@
+{
+  "manifest_version": 2,
+  "name": "simple-image-collector",
+  "version": "1.0.11",
+  "description": "__MSG_description_sic__",
+  "permissions": ["<all_urls>", "activeTab", "tabs", "contextMenus", "storage", "clipboardWrite", "downloads"],
+  "browser_action": {},
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "default_locale": "en",
+  "options_ui": {
+    "page": "options.html",
+    "browser_style": true
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["content.js"]
+    }
+  ]
+}

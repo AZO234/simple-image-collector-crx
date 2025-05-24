@@ -62,6 +62,8 @@ interface sicStorageOptions {
   txtA2DlDirP: string;
 }
 
+const isFirefox = navigator.userAgent.includes("Firefox");
+
 function convertOptionsToStorage(options: sicOptions): sicStorageOptions {
   return {
     rxImgExtPattern: options.imgExtPattern.source,
@@ -114,11 +116,19 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 // on click extentions icon
-chrome.action.onClicked.addListener(async (tab) => {
-  if(tab.id) {
-    await chrome.tabs.sendMessage(tab.id, { action: 'azo_sic_collectitems' });
-  }
-});
+if(isFirefox) {
+  chrome.browserAction.onClicked.addListener(async (tab) => {
+    if(tab.id) {
+      await chrome.tabs.sendMessage(tab.id, { action: 'azo_sic_collectitems' });
+    }
+  });
+} else {
+  chrome.action.onClicked.addListener(async (tab) => {
+    if(tab.id) {
+      await chrome.tabs.sendMessage(tab.id, { action: 'azo_sic_collectitems' });
+    }
+  });
+}
 
 // on click contextmenu
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {

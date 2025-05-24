@@ -19,6 +19,10 @@
     "message": "चुनिंदा छवियाँ डाउनलोड करें.",
     "description": "popover for Download button."
   },
+  "download_started": {
+    "message": "डाउनलोड प्रारंभ हुआ.",
+    "description": "download started."
+  },
   "copy": {
     "message": "प्रतिलिपि",
     "description": "Copy URLs of selected images."
@@ -27,6 +31,10 @@
     "message": "चयनित छवियों के यूआरएल कॉपी करें।",
     "description": "popover for Copy button."
   },
+  "copied": {
+    "message": "नकल की गई.",
+    "description": "Copied."
+  },
   "send_to_aria2": {
     "message": "Aria2 को भेजें",
     "description": "Download selected images with Aria2."
@@ -34,6 +42,10 @@
   "send_to_aria2_popover": {
     "message": "Aria2 के साथ चयनित छवियाँ डाउनलोड करें।",
     "description": "popover for Send to Aria2 button."
+  },
+  "sent_to_aria2": {
+    "message": "Aria2 JSON-RPC को भेजा गया.",
+    "description": "Sent to Aria2 JSON-RPC."
   },
   "clear": {
     "message": "स्पष्ट",

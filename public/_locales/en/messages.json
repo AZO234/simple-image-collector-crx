@@ -19,6 +19,10 @@
     "message": "Download select images.",
     "description": "popover for Download button."
   },
+  "download_started": {
+    "message": "Download started.",
+    "description": "download started."
+  },
   "copy": {
     "message": "Copy",
     "description": "Copy URLs of selected images."
@@ -27,6 +31,10 @@
     "message": "Copy URLs of selected images.",
     "description": "popover for Copy button."
   },
+  "copied": {
+    "message": "Copied.",
+    "description": "Copied."
+  },
   "send_to_aria2": {
     "message": "Send to Aria2",
     "description": "Download selected images with Aria2."
@@ -34,6 +42,10 @@
   "send_to_aria2_popover": {
     "message": "Download selected images with Aria2.",
     "description": "popover for Send to Aria2 button."
+  },
+  "sent_to_aria2": {
+    "message": "Sent to Aria2 JSON-RPC.",
+    "description": "Sent to Aria2 JSON-RPC."
   },
   "clear": {
     "message": "Clear",

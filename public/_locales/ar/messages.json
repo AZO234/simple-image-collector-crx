@@ -27,6 +27,10 @@
     "message": "انسخ عناوين URL للصور المحددة.",
     "description": "popover for Copy button."
   },
+  "copied": {
+    "message": "منقول.",
+    "description": "Copied."
+  },
   "send_to_aria2": {
     "message": "Aria2 أرسل إلى",
     "description": "Download selected images with Aria2."
@@ -34,6 +38,10 @@
   "send_to_aria2_popover": {
     "message": "قم بتنزيل الصور المحددة باستخدام Aria2.",
     "description": "popover for Send to Aria2 button."
+  },
+  "sent_to_aria2": {
+    "message": "تم إرسال الصور إلى Aria2 JSON-RPC.",
+    "description": "Sent to Aria2 JSON-RPC."
   },
   "clear": {
     "message": "واضح",

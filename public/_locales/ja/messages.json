@@ -19,6 +19,10 @@
     "message": "選択された画像をダウンロード。",
     "description": "popover for Download button."
   },
+  "download_started": {
+    "message": "ダウンロードを開始しました。",
+    "description": "download started."
+  },
   "copy": {
     "message": "コピー",
     "description": "Copy URLs of selected images."
@@ -27,6 +31,10 @@
     "message": "選択された画像の URL をコピー。",
     "description": "popover for Copy button."
   },
+  "copied": {
+    "message": "コピーされました。",
+    "description": "Copied."
+  },
   "send_to_aria2": {
     "message": "Aria2 に送信",
     "description": "Download selected images with Aria2."
@@ -34,6 +42,10 @@
   "send_to_aria2_popover": {
     "message": "選択された画像を Aria2 でダウンロード。",
     "description": "popover for Send to Aria2 button."
+  },
+  "sent_to_aria2": {
+    "message": "Aria2 JSON-RPC に送信しました。",
+    "description": "Sent to Aria2 JSON-RPC."
   },
   "clear": {
     "message": "解除",

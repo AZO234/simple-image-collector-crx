@@ -60,9 +60,10 @@ interface sicWorkItem {
   check: number;
   type: string;
   url: string;
-  iframeTag: HTMLIFrameElement | null;
-  iframeIndex: number;
-  iframeDepth: number;
+  frameIndex: number;
+  frameTag: Element | null;
+  frameType: string;
+  frameDepth: number;
   image: {
     url: string;
     type: string;
@@ -78,33 +79,37 @@ interface sicItem {
   check: number;
   type: string;
   url: string;
-  iframeIndex: number;
-  iframeDepth: number;
+  frameIndex: number;
+  frameType: string;
+  frameDepth: number;
+  a2able: boolean;
   image: {
     url: string;
+    filename: string;
     type: string;
     mime: string;
     width: number;
     height: number;
-    data: string;
+    html: string;
     inCSS: boolean;
   } | null;
 }
-interface sicIframe {
+interface sicFrame {
   index: number;
-  iframeTag: HTMLIFrameElement;
-  iframeIndex: number;
-  iframeDepth: number;
+  frameTag: Element | null;
+  frameType: string;
+  frameDepth: number;
 }
 
 async function collectItems(): Promise<number> {
   let tagIndex: number = 0;
+  let frameIndex: number = 0;
 
   const sicAllTags: sicWorkTag[] = [];
   const sicWorkItems: sicWorkItem[] = [];
   const sicItems: sicItem[] = [];
 
-  const sicIframes: sicIframe[] = [];
+  const sicFrames: sicFrame[] = [];
 
   function isUniqueItem(url: string): boolean {
     for(const item of sicWorkItems) {
@@ -124,9 +129,9 @@ async function collectItems(): Promise<number> {
     return true;
   }
 
-  function isUniqueIframe(ifTag: HTMLIFrameElement): boolean {
-    for(const sifTag of sicIframes) {
-      if(sifTag.iframeTag === ifTag) {
+  function isUniqueFrame(fTag: HTMLIFrameElement | HTMLFrameElement | HTMLTemplateElement): boolean {
+    for(const sifTag of sicFrames) {
+      if(sifTag.frameTag === fTag) {
         return false;
       }
     }
@@ -142,12 +147,72 @@ async function collectItems(): Promise<number> {
     return null;
   }
 
-  function processDocument(doc: Document, ifTag: HTMLIFrameElement | null, ifIdx: number, ifDpt: number): void {
+  function extractImageUrlsFromLDJsonScript(scriptTag: HTMLScriptElement): string[] {
+    const urls: string[] = [];
+
+    function pushIfValid(value: unknown) {
+      if (typeof value === "string") {
+        const a = document.createElement("a");
+        a.href = value;
+        urls.push(a.href);
+      }
+    }
+
+    function handleImageField(image: any) {
+      if (typeof image === "string") {
+        pushIfValid(image);
+      } else if (Array.isArray(image)) {
+        image.forEach(handleImageField);
+      } else if (typeof image === "object" && image !== null) {
+        pushIfValid(image.url);
+      }
+    }
+
+    function extractFromObject(obj: any) {
+      if (!obj || typeof obj !== "object") return;
+
+      handleImageField(obj.image);
+      handleImageField(obj.logo);
+      pushIfValid(obj.thumbnailUrl);
+
+      // @graphがある場合はその中を再帰
+      if (Array.isArray(obj['@graph'])) {
+        obj['@graph'].forEach(extractFromObject);
+      }
+
+      // 他にも mainEntity や nested な構造があれば見る
+      if (obj.mainEntity) extractFromObject(obj.mainEntity);
+    }
+
+    try {
+      const raw = scriptTag.textContent || '{}';
+      const data = JSON.parse(raw);
+
+      if (Array.isArray(data)) {
+        data.forEach(extractFromObject);
+      } else {
+        extractFromObject(data);
+      }
+    } catch (e) {
+      console.warn('JSON parse error in <ld+json>:', e);
+    }
+
+    return urls;
+  }  
+
+  function processDocument(doc: Document | DocumentFragment | ShadowRoot, frame: sicFrame): void {
     // convert to absolute URL
-    function absoluteUrl(url: string): string {
-      const a = doc.createElement('a');
-      a.href = url;
-      return a.href;
+    function absoluteUrl(url: string, context: Document | DocumentFragment | ShadowRoot): string {
+      const base = (context instanceof Document)
+        ? context.baseURI
+        : (context instanceof ShadowRoot)
+          ? context.host?.ownerDocument?.baseURI ?? document.baseURI
+          : document.baseURI;
+      try {
+        return new URL(url, base).href;
+      } catch {
+        return url;
+      }
     }
 
     // wait for DOM loaded
@@ -168,6 +233,36 @@ async function collectItems(): Promise<number> {
       tagIndex++;
     }
 
+    // 'script & ld+json' tag
+    for(const tag of doc.querySelectorAll('script[type="application/ld+json"]')) {
+      const sicScriptTag = getFromAllTag(tag);
+      if(sicScriptTag) {
+        const urls = extractImageUrlsFromLDJsonScript(tag as HTMLScriptElement);
+        console.warn(urls);
+        urls.forEach((url) => {
+          const extRes = (url.match(sicOptionsContent.imgExtPattern) || [])[1] || '';
+          sicWorkItems.push({
+            tag: sicScriptTag,
+            check: 0,
+            type: 'ld+json',
+            url: url,
+            frameIndex: frame.index,
+            frameTag: frame.frameTag,
+            frameType: frame.frameType,
+            frameDepth: frame.frameDepth,
+            image: {
+              url: url,
+              type: extRes,
+              mime: '',
+              width: 0,
+              height: 0,
+              inCSS: false
+            }
+          });
+        });
+      }
+    };
+
     // 'link' tag
     for(const tag of doc.querySelectorAll('link')) {
       const linkTag = <HTMLLinkElement>tag;
@@ -175,7 +270,7 @@ async function collectItems(): Promise<number> {
         if(/preload/i.test(linkTag.rel) && !/image/i.test(linkTag.as)) {
           continue;
         }
-        const url = absoluteUrl(linkTag.href);
+        const url = absoluteUrl(linkTag.href, doc);
         if(isUniqueItem(url)) {
           const sicLinkTag = getFromAllTag(linkTag);
           const extRes = (url.match(sicOptionsContent.imgExtPattern) || [])[1] || '';
@@ -185,9 +280,10 @@ async function collectItems(): Promise<number> {
               check: 0,
               type: 'link',
               url: url,
-              iframeTag: ifTag,
-              iframeIndex: ifIdx,
-              iframeDepth: ifDpt,
+              frameIndex: frame.index,
+              frameTag: frame.frameTag,
+              frameType: frame.frameType,
+              frameDepth: frame.frameDepth,
               image: {
                 url: url,
                 type: extRes,
@@ -206,7 +302,7 @@ async function collectItems(): Promise<number> {
     for(const tag of doc.querySelectorAll('meta')) {
       const metaTag = <HTMLMetaElement>tag;
       if(/(icon|image)$/i.test(metaTag.name)) {
-        const url = absoluteUrl(metaTag.content);
+        const url = absoluteUrl(metaTag.content, doc);
         if(isUniqueItem(url)) {
           const sicMetaTag = getFromAllTag(metaTag);
           const extRes = (url.match(sicOptionsContent.imgExtPattern) || [])[1] || '';
@@ -216,9 +312,10 @@ async function collectItems(): Promise<number> {
               check: 0,
               type: 'meta',
               url: url,
-              iframeTag: ifTag,
-              iframeIndex: ifIdx,
-              iframeDepth: ifDpt,
+              frameIndex: frame.index,
+              frameTag: frame.frameTag,
+              frameType: frame.frameType,
+              frameDepth: frame.frameDepth,
               image: {
                 url: url,
                 type: extRes,
@@ -236,7 +333,7 @@ async function collectItems(): Promise<number> {
     // 'img' tag
     for(const tag of doc.querySelectorAll('img')) {
       const imgTag = <HTMLImageElement>tag;
-      const url = absoluteUrl(imgTag.src);
+      const url = absoluteUrl(imgTag.src, doc);
       if(isUniqueItem(url)) {
         const sicImgTag = getFromAllTag(imgTag);
         const extRes = (url.match(sicOptionsContent.imgExtPattern) || [])[1] || '';
@@ -246,9 +343,10 @@ async function collectItems(): Promise<number> {
             check: 0,
             type: 'img',
             url: url,
-            iframeTag: ifTag,
-            iframeIndex: ifIdx,
-            iframeDepth: ifDpt,
+            frameIndex: frame.index,
+            frameTag: frame.frameTag,
+            frameType: frame.frameType,
+            frameDepth: frame.frameDepth,
             image: {
               url: url,
               type: extRes,
@@ -267,7 +365,7 @@ async function collectItems(): Promise<number> {
       const pictureTag = <HTMLPictureElement>taga;
       for(const tagb of pictureTag.querySelectorAll('source')) {
         const sourceTag = <HTMLSourceElement>tagb;
-        const url = absoluteUrl(sourceTag.srcset);
+        const url = absoluteUrl(sourceTag.srcset, doc);
         if(isUniqueItem(url)) {
           const sicSourceTag = getFromAllTag(sourceTag);
           const extRes = (url.match(sicOptionsContent.imgExtPattern) || [])[1] || '';
@@ -277,9 +375,10 @@ async function collectItems(): Promise<number> {
               check: 0,
               type: 'source',
               url: url,
-              iframeTag: ifTag,
-              iframeIndex: ifIdx,
-              iframeDepth: ifDpt,
+              frameIndex: frame.index,
+              frameTag: frame.frameTag,
+              frameType: frame.frameType,
+              frameDepth: frame.frameDepth,
               image: {
                 url: url,
                 type: extRes,
@@ -307,9 +406,10 @@ async function collectItems(): Promise<number> {
               check: 0,
               type: 'canvas',
               url: url,
-              iframeTag: ifTag,
-              iframeIndex: ifIdx,
-              iframeDepth: ifDpt,
+              frameIndex: frame.index,
+              frameTag: frame.frameTag,
+              frameType: frame.frameType,
+              frameDepth: frame.frameDepth,
               image: {
                 url: url,
                 type: '',
@@ -330,9 +430,10 @@ async function collectItems(): Promise<number> {
             check: 0,
             type: 'canvas',
             url: 'error',
-            iframeTag: ifTag,
-            iframeIndex: ifIdx,
-            iframeDepth: ifDpt,
+            frameIndex: frame.index,
+            frameTag: frame.frameTag,
+            frameType: frame.frameType,
+            frameDepth: frame.frameDepth,
             image: null
           });
         }
@@ -344,7 +445,7 @@ async function collectItems(): Promise<number> {
       const style = window.getComputedStyle(tag); 
       const url = (style.background.match(/url\(['"](.*?)['"]\)/i) || [])[1] || '';
       if(url !== '' && url !== 'none') {
-        if(isUniqueItem(absoluteUrl(url))) {
+        if(isUniqueItem(absoluteUrl(url, doc))) {
           const sicTag = getFromAllTag(tag);
           const extRes = (url.match(sicOptionsContent.imgExtPattern) || [])[1] || '';
           if(sicTag) {
@@ -353,9 +454,10 @@ async function collectItems(): Promise<number> {
               check: 0,
               type: 'bgimg',
               url: url,
-              iframeTag: ifTag,
-              iframeIndex: ifIdx,
-              iframeDepth: ifDpt,
+              frameIndex: frame.index,
+              frameTag: frame.frameTag,
+              frameType: frame.frameType,
+              frameDepth: frame.frameDepth,
               image: {
                 url: url,
                 type: extRes,
@@ -370,7 +472,7 @@ async function collectItems(): Promise<number> {
       }
       const urla = (style.backgroundImage.match(/url\(['"](.*?)['"]\)/i) || [])[1] || '';
       if(urla && urla !== '' && urla !== 'none') {
-        if(isUniqueItem(absoluteUrl(urla))) {
+        if(isUniqueItem(absoluteUrl(urla, doc))) {
           const sicTag = getFromAllTag(tag);
           const extRes = (urla.match(sicOptionsContent.imgExtPattern) || [])[1] || '';
           if(sicTag) {
@@ -379,9 +481,10 @@ async function collectItems(): Promise<number> {
               check: 0,
               type: 'bgimg',
               url: urla,
-              iframeTag: ifTag,
-              iframeIndex: ifIdx,
-              iframeDepth: ifDpt,
+              frameIndex: frame.index,
+              frameTag: frame.frameTag,
+              frameType: frame.frameType,
+              frameDepth: frame.frameDepth,
               image: {
                 url: urla,
                 type: extRes,
@@ -407,18 +510,19 @@ async function collectItems(): Promise<number> {
             check: 0,
             type: 'svg',
             url: '',
-            iframeTag: ifTag,
-            iframeIndex: ifIdx,
-            iframeDepth: ifDpt,
+            frameIndex: frame.index,
+            frameTag: frame.frameTag,
+            frameType: frame.frameType,
+            frameDepth: frame.frameDepth,
             image: {
               url: '',
               type: 'svg',
               mime: '',
-              width: 0,
-              height: 0,
+              width: svgTag.width.baseVal.value,
+              height: svgTag.height.baseVal.value,
               inCSS: false
             }
-        });
+          });
         }
       }
     }
@@ -426,7 +530,7 @@ async function collectItems(): Promise<number> {
     // 'a' tag to image
     for(const tag of doc.querySelectorAll('a')) {
       const aTag = <HTMLAnchorElement>tag;
-      const url = absoluteUrl(aTag.href);
+      const url = absoluteUrl(aTag.href, doc);
       if(isUniqueItem(url)) {
         const sicATag = getFromAllTag(aTag);
         const extRes = (aTag.href.match(sicOptionsContent.imgExtPattern) || [])[1] || '';
@@ -437,9 +541,10 @@ async function collectItems(): Promise<number> {
               check: 0,
               type: 'atoimg',
               url: url,
-              iframeTag: ifTag,
-              iframeIndex: ifIdx,
-              iframeDepth: ifDpt,
+              frameIndex: frame.index,
+              frameTag: frame.frameTag,
+              frameType: frame.frameType,
+              frameDepth: frame.frameDepth,
               image: {
                 url: url,
                 type: extRes,
@@ -455,9 +560,10 @@ async function collectItems(): Promise<number> {
               check: 0,
               type: 'atoimg',
               url: url,
-              iframeTag: ifTag,
-              iframeIndex: ifIdx,
-              iframeDepth: ifDpt,
+              frameIndex: frame.index,
+              frameTag: frame.frameTag,
+              frameType: frame.frameType,
+              frameDepth: frame.frameDepth,
               image: null
             });
           }
@@ -470,7 +576,7 @@ async function collectItems(): Promise<number> {
       const mapTag = <HTMLMapElement>tag;
       for(const atag of mapTag.querySelectorAll('area')) {
         const areaTag = <HTMLAreaElement>atag;
-        const url = absoluteUrl(areaTag.href);
+        const url = absoluteUrl(areaTag.href, doc);
         if(isUniqueItem(url)) {
           const sicAreaTag = getFromAllTag(areaTag);
           const extRes = (areaTag.href.match(sicOptionsContent.imgExtPattern) || [])[1] || '';
@@ -481,9 +587,10 @@ async function collectItems(): Promise<number> {
                 check: 0,
                 type: 'areatoimg',
                 url: url,
-                iframeTag: ifTag,
-                iframeIndex: ifIdx,
-                iframeDepth: ifDpt,
+                frameIndex: frame.index,
+                frameTag: frame.frameTag,
+                frameType: frame.frameType,
+                frameDepth: frame.frameDepth,
                 image: {
                   url: url,
                   type: extRes,
@@ -499,9 +606,10 @@ async function collectItems(): Promise<number> {
                 check: 0,
                 type: 'areatoimg',
                 url: url,
-                iframeTag: ifTag,
-                iframeIndex: ifIdx,
-                iframeDepth: ifDpt,
+                frameIndex: frame.index,
+                frameTag: frame.frameTag,
+                frameType: frame.frameType,
+                frameDepth: frame.frameDepth,
                 image: null
               });
             }
@@ -515,7 +623,7 @@ async function collectItems(): Promise<number> {
       const aTag = <HTMLAnchorElement>tag;
       const imgs = aTag.querySelectorAll('img');
       if(imgs.length) {
-        const url = absoluteUrl(aTag.href);
+        const url = absoluteUrl(aTag.href, doc);
         if(isUniqueItem(url)) {
           const sicATag = getFromAllTag(aTag);
           if(sicATag) {
@@ -524,9 +632,10 @@ async function collectItems(): Promise<number> {
               check: 0,
               type: 'a+img',
               url: url,
-              iframeTag: ifTag,
-              iframeIndex: ifIdx,
-              iframeDepth: ifDpt,
+              frameIndex: frame.index,
+              frameTag: frame.frameTag,
+              frameType: frame.frameType,
+              frameDepth: frame.frameDepth,
               image: null
             });
           }
@@ -538,16 +647,89 @@ async function collectItems(): Promise<number> {
     for(const tag of doc.querySelectorAll('iframe')) {
       const iframeTag = <HTMLIFrameElement>tag;
       if(iframeTag.contentDocument) {
-        if(isUniqueIframe(iframeTag)) {
-          sicIframes.push({
-            index: ifIdx,
-            iframeTag: iframeTag,
-            iframeIndex: ifIdx,
-            iframeDepth: ifDpt
+        if(isUniqueFrame(iframeTag)) {
+          sicFrames.push({
+            index: frameIndex,
+            frameTag: frame.frameTag,
+            frameType: frame.frameType,
+            frameDepth: frame.frameDepth
           });
-          ifIdx++;
-          if(ifDpt < 10) {
-            processDocument(iframeTag.contentDocument, iframeTag, ifIdx, ifDpt + 1);
+          frameIndex++;
+          if(frame.frameDepth < 10) {
+            processDocument(iframeTag.contentDocument, {
+              index: frameIndex,
+              frameTag: iframeTag,
+              frameType: 'iframe',
+              frameDepth: frame.frameDepth + 1
+            });
+          }
+        }
+      }
+    }
+
+    // shadow DOM (recursive)
+    for(const tag of allTags) {
+      const shadowRoot = (tag as Element).shadowRoot;
+      if (shadowRoot && shadowRoot.mode === 'open') {
+        sicFrames.push({
+          index: frameIndex,
+          frameTag: frame.frameTag,
+          frameType: frame.frameType,
+          frameDepth: frame.frameDepth
+        });
+        frameIndex++;
+        if(frame.frameDepth < 10) {
+          processDocument(shadowRoot, {
+            index: frameIndex,
+            frameTag: tag,
+            frameType: 'shadow',
+            frameDepth: frame.frameDepth + 1
+          });
+        }
+      }
+    }
+
+    // DocumentFragment (recursive)
+    for(const tag of allTags) {
+      const templateTag = <HTMLTemplateElement>tag;
+      if (templateTag.content && templateTag.content instanceof DocumentFragment) {
+        sicFrames.push({
+          index: frameIndex,
+          frameTag: frame.frameTag,
+          frameType: frame.frameType,
+          frameDepth: frame.frameDepth
+        });
+        frameIndex++;
+        if(frame.frameDepth < 10) {
+          processDocument(templateTag.content, {
+            index: frameIndex,
+            frameTag: templateTag,
+            frameType: 'docfragment',
+            frameDepth: frame.frameDepth + 1
+          });
+        }
+      }
+    }
+
+    // legacy frame tag (recursive)
+    for(const tag of doc.querySelectorAll('frame')) {
+      const frameTag = <HTMLFrameElement>tag;
+      if(frameTag.contentDocument) {
+        if(isUniqueFrame(frameTag)) {
+          sicFrames.push({
+            index: frameIndex,
+            frameTag: frame.frameTag,
+            frameType: frame.frameType,
+            frameDepth: frame.frameDepth
+          });
+          frameIndex++;
+          if(frameIndex < 10) {
+            processDocument(frameTag.contentDocument, {
+              index: frameIndex,
+              frameTag: frameTag,
+              frameType: 'frame',
+              frameDepth: frame.frameDepth + 1
+            });
           }
         }
       }
@@ -555,7 +737,12 @@ async function collectItems(): Promise<number> {
   }
 
   // Start traversing the DOM from the top-level document
-  processDocument(document, null, 0, 0);
+  processDocument(document, {
+    index: 0,
+    frameTag: null,
+    frameType: 'document',
+    frameDepth: 0
+  });
 
   function workToItem(wi: sicWorkItem): sicItem {
     const item: sicItem = {
@@ -564,22 +751,26 @@ async function collectItems(): Promise<number> {
       check: wi.check,
       type: wi.type,
       url: wi.url,
-      iframeIndex: wi.iframeIndex,
-      iframeDepth: wi.iframeDepth,
-      image: null
+      frameIndex: wi.frameIndex,
+      frameType: wi.frameType,
+      frameDepth: wi.frameDepth,
+      image: null,
+      a2able: false
     };
     if(wi.image) {
+      item.a2able = true;
       item.image = {
         url: wi.image.url,
+        filename: wi.image.url.split('/').pop() || '',
         type: wi.image.type,
         mime: wi.image.mime,
         width: wi.image.width,
         height: wi.image.height,
-        data: '',
+        html: '',
         inCSS: wi.image.inCSS
       };
       if(/svg/i.test(item.tag)) {
-        item.image.data = wi.tag.tag.outerHTML;
+        item.image.html = wi.tag.tag.outerHTML;
       }
     }
 

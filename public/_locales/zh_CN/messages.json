@@ -19,6 +19,10 @@
     "message": "下载选定的图像。",
     "description": "popover for Download button."
   },
+  "download_started": {
+    "message": "загрузка началась.",
+    "description": "下载开始。"
+  },
   "copy": {
     "message": "复制",
     "description": "Copy URLs of selected images."
@@ -27,6 +31,10 @@
     "message": "复制所选图像的 URL。",
     "description": "popover for Copy button."
   },
+  "copied": {
+    "message": "已复制。",
+    "description": "Copied."
+  },
   "send_to_aria2": {
     "message": "发送至 Aria2",
     "description": "Download selected images with Aria2."
@@ -34,6 +42,10 @@
   "send_to_aria2_popover": {
     "message": "使用 Aria2 下载选定的图像。",
     "description": "popover for Send to Aria2 button."
+  },
+  "sent_to_aria2": {
+    "message": "发送到 Aria2 JSON-RPC。",
+    "description": "Sent to Aria2 JSON-RPC."
   },
   "clear": {
     "message": "清除",

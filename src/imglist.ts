@@ -94,8 +94,13 @@ async function getImageInfo(item: sicItem, timeout = 10000): Promise<number> {
     }
     if(/^data:/i.test(item.image.url)) {
       console.log(`gii: URL is data. ${item.image.url}`);
-      resolve(2);
-      return;
+//      resolve(2);
+//      return;
+    }
+    if(/^blob:/i.test(item.image.url)) {
+      console.log(`gii: URL is blob. ${item.image.url}`);
+//      resolve(3);
+//      return;
     }
 
     const img = new Image();
@@ -181,6 +186,24 @@ async function getImageInfo(item: sicItem, timeout = 10000): Promise<number> {
   });
 }
 
+function dataUrlToBlob(dataUrl: string): Blob {
+  const [header, data] = dataUrl.split(',');
+  const mimeMatch = header.match(/data:([^;]+)(;base64)?/);
+  const mime = mimeMatch ? mimeMatch[1] : 'application/octet-stream';
+  const isBase64 = mimeMatch?.[2] === ';base64';
+  if (isBase64) {
+    const binary = atob(data);
+    const array = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      array[i] = binary.charCodeAt(i);
+    }
+    return new Blob([array], { type: mime });
+  } else {
+    const text = decodeURIComponent(data);
+    return new Blob([text], { type: mime });
+  }
+}
+
 chrome.runtime.onMessage.addListener((message) => {
   switch(message.action) {
     case 'azo_sic_sendlist':
@@ -238,11 +261,61 @@ async function start(title: string, url: string, sicWorkItems: sicItem[]) {
   // setup items
   const loadImageProms: Promise<number>[] = [];
   for(const item of sicWorkItems) {
-    if(!/svg/i.test(item.tag) && item.image) {
-      loadImageProms.push(getImageInfo(item, sicOptionsImgList.rTimeout));
+    if(item.image) {
+      // SVG
+      if(/svg/i.test(item.tag)) {
+        const blob = new Blob(
+          [`<?xml version="1.0" encoding="UTF-8"?>\n${item.image.html}`],
+          { type: "image/svg+xml" }
+        );
+        item.url = item.image.url = URL.createObjectURL(blob);
+        item.image.mime = 'image/svg+xml';
+        item.a2able = false;
+      } else {
+        // data:
+        if(/^data:/i.test(item.image.url)) {
+          const blob = dataUrlToBlob(item.image.url);
+          item.url = item.image.url = URL.createObjectURL(blob);
+          item.a2able = false;
+        // blob:  
+        } else if(/^blob:/i.test(item.image.url)) { 
+          const res = await fetch(item.image.url);
+          const blob = await res.blob();
+          item.url = item.image.url = URL.createObjectURL(blob);
+          item.a2able = false;
+        }
+        loadImageProms.push(getImageInfo(item, sicOptionsImgList.rTimeout));
+      }
     }
   }
   await Promise.all(loadImageProms);
+
+  // URL don't have filename
+  for(const item of sicWorkItems) {
+    if(item.image) {
+      if(item.image.filename === '') {
+        if (item.image.mime === 'image/svg+xml') {
+          item.image.filename = item.index + '.svg';
+        } else if (item.image.mime === 'image/bmp') {
+          item.image.filename = item.index + '.bmp';
+        } else if (item.image.mime === 'image/gif') {
+          item.image.filename = item.index + '.gif';
+        } else if (item.image.mime === 'image/tiff(LE)') {
+          item.image.filename = item.index + '.tiff';
+        } else if (item.image.mime === 'image/tiff(BE)') {
+          item.image.filename = item.index + '.tiff';
+        } else if (item.image.mime === 'image/webp') {
+          item.image.filename = item.index + '.webp';
+        } else if (item.image.mime === 'image/png') {
+          item.image.filename = item.index + '.png';
+        } else if (item.image.mime === 'image/jpeg') {
+          item.image.filename = item.index + '.jpg';
+        } else {
+          item.image.filename = item.index.toString();
+        }
+      }
+    }
+  }
 
   for(const item of sicWorkItems) {
     if(item.image) {
@@ -372,56 +445,36 @@ function updateRow(item: sicItem) {
   if(displayURL.length > 64) {
     displayURL = displayURL.replace(/(^.{32}).*(.{32}$)/, "$1 ... $2");
   }
-  if(item.iframeIndex || item.iframeDepth) {
+  if(item.frameIndex || item.frameDepth) {
     if(item.image) {
-      if(item.tag === 'SVG') {
-        if(/width\s*=\s*['"]?\d+['"]?/i.test(item.image.data)) {
-          item.image.data = item.image.data.replace(/width\s*=\s*['"]?\d+['"]?/i, `width="${sicOptionsImgList.thumbnailWidth}"`);
-        } else {
-          item.image.data = item.image.data.replace(/(<svg )/i, `$1width="${sicOptionsImgList.thumbnailWidth}" `);
-        }
-        item.image.data = item.image.data.replace(/height\s*=\s*['"]?\d+['"]?/i, '');
-        cols[5].innerHTML = `
-        <div class="container-fluid ms-2">
-          <div class="row">
-            <div class="col-6 col-lg-3 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="" data-img-data="${encodeURI(item.image.data)}" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
-              ${item.image.data}
-            </div>  
-            <div class="col-6 col-lg-9 text-start">
-              ${item.iframeIndex ? '<br>iframe: ' + item.iframeIndex : ''}
-              ${item.iframeDepth ? '<br>depth: ' + item.iframeDepth : ''}
-              ${item.image.inCSS ? '<br>' + chrome.i18n.getMessage("in_css") : ''}
-            </div>
+      cols[5].innerHTML = `
+      <div class="container-fluid ms-2">
+        <div class="row">
+          <div class="col-6 col-lg-3 img-thumbnail p-1" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="${item.image.url}" data-img-data="" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
+            <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}" alt="thumbnail">
+          </div>  
+          <div class="col-6 col-lg-9 text-start">
+            ${item.image.width}x${item.image.height}
+            ${item.frameIndex ? '<br>frmid: ' + item.frameIndex : ''}
+            ${item.frameType ? '<br>frmtype: ' + item.frameType : ''}
+            ${item.frameDepth ? '<br>frmdepth: ' + item.frameDepth : ''}
+            ${item.image.inCSS ? '<br>' + chrome.i18n.getMessage("in_css") : ''}
           </div>
-        </div>`;
-      } else {
-        cols[5].innerHTML = `
-        <div class="container-fluid ms-2">
-          <div class="row">
-            <div class="col-6 col-lg-3 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="${item.image.url}" data-img-data="" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
-              <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}" alt="thumbnail">
-            </div>  
-            <div class="col-6 col-lg-9 text-start">
-              ${item.image.width}x${item.image.height}
-              ${item.iframeIndex ? '<br>iframe: ' + item.iframeIndex : ''}
-              ${item.iframeDepth ? '<br>depth: ' + item.iframeDepth : ''}
-              ${item.image.inCSS ? '<br>' + chrome.i18n.getMessage("in_css") : ''}
-            </div>
+        </div>
+        <div class="row">
+          <div class="col-12 text-start">
+            <a class="link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="${item.url}" target="_blank">${displayURL}</a>
           </div>
-          <div class="row">
-            <div class="col-12 text-start">
-              <a class="link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="${item.url}" target="_blank">${displayURL}</a>
-            </div>
-          </div>
-        </div>`;
-      }
+        </div>
+      </div>`;
     } else {
       cols[5].innerHTML = `
       <div class="container-fluid ms-2">
         <div class="row">
           <div class="col-12 text-start">
-            ${item.iframeIndex ? '<br>iframe: ' + item.iframeIndex : ''}
-            ${item.iframeDepth ? '<br>depth: ' + item.iframeDepth : ''}
+            ${item.frameIndex ? '<br>frmid: ' + item.frameIndex : ''}
+            ${item.frameType ? '<br>frmtype: ' + item.frameType : ''}
+            ${item.frameDepth ? '<br>frmdepth: ' + item.frameDepth : ''}
           </div>
         </div>
         <div class="row">
@@ -433,43 +486,23 @@ function updateRow(item: sicItem) {
     }
   } else {
     if(item.image) {
-      if(item.tag === 'SVG') {
-        if(/width\s*=\s*['"]?\d+['"]?/i.test(item.image.data)) {
-          item.image.data = item.image.data.replace(/width\s*=\s*['"]?\d+['"]?/i, `width="${sicOptionsImgList.thumbnailWidth}"`);
-        } else {
-          item.image.data = item.image.data.replace(/(<svg )/i, `$1width="${sicOptionsImgList.thumbnailWidth}" `);
-        }
-        item.image.data = item.image.data.replace(/height\s*=\s*['"]?\d+['"]?/i, '');
-        cols[5].innerHTML = `
-        <div class="container-fluid ms-2">
-          <div class="row">
-            <div class="col-6 col-lg-3 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="" data-img-data="${encodeURI(item.image.data)}" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
-              ${item.image.data}
-            </div>  
-            <div class="col-6 col-lg-9 text-start">
-              ${item.image.inCSS ? '<br>' + chrome.i18n.getMessage("in_css") : ''}
-            </div>
+      cols[5].innerHTML = `
+      <div class="container-fluid ms-2">
+        <div class="row">
+          <div class="col-6 col-lg-3 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="${item.image.url}" data-img-data="" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
+            <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}" alt="thumbnail">
           </div>
-        </div>`;
-      } else {
-        cols[5].innerHTML = `
-        <div class="container-fluid ms-2">
-          <div class="row">
-            <div class="col-6 col-lg-3 img-thumbnail" data-bs-toggle="modal" data-bs-target="#modal" data-img-url="${item.image.url}" data-img-data="" style="background: ${sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor};">
-              <img src="${item.image.url}" width="${sicOptionsImgList.thumbnailWidth}" alt="thumbnail">
-            </div>
-            <div class="col-6 col-lg-9 text-start">
-              ${item.image.width}x${item.image.height}
-              ${item.image.inCSS ? '<br>' + chrome.i18n.getMessage("in_css") : ''}
-            </div>
+          <div class="col-6 col-lg-9 text-start">
+            ${item.image.width}x${item.image.height}
+            ${item.image.inCSS ? '<br>' + chrome.i18n.getMessage("in_css") : ''}
           </div>
-          <div class="row">
-            <div class="col-12 text-start">
-              <a class="link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="${item.url}" target="_blank">${displayURL}</a>
-            </div>
+        </div>
+        <div class="row">
+          <div class="col-12 text-start">
+            <a class="link-underline link-underline-opacity-0 link-underline-opacity-100-hover" href="${item.url}" target="_blank">${displayURL}</a>
           </div>
-        </div>`;
-      }
+        </div>
+      </div>`;
     } else {
       cols[5].innerHTML = `
         <div class="row">
@@ -491,17 +524,6 @@ function updateRow(item: sicItem) {
           modalimg.style.background = sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor;
           modalimg.innerHTML = `<img src="${this.getAttribute('data-img-url')}" alt="original image">`;
         });
-      }
-    } else {
-      const svgs = cols[5].getElementsByTagName('svg');
-      if(svgs && svgs.length > 0) {
-        const svg = <SVGSVGElement>svgs[0];
-        if(svg.parentElement) {
-          svg.parentElement.addEventListener('click', function () {
-            modalimg.style.background = sicOptionsImgList.bgChecker ? 'url(\'images/checker.svg\')' : sicOptionsImgList.bgColor;
-            modalimg.innerHTML = decodeURI(this.getAttribute('data-img-data') || '');
-          });
-        }
       }
     }
   }
@@ -579,7 +601,7 @@ function addRow(item: sicItem) {
           re.test(item.image.type) ||
           re.test(item.image.mime) ||
           re.test(item.image.url) ||
-          re.test(item.image.data)
+          re.test(item.image.html)
         )) {
           bFound = true;
         }
@@ -595,7 +617,7 @@ function addRow(item: sicItem) {
           item.image.type.includes(searchText) ||
           item.image.mime.includes(searchText) ||
           item.image.url.includes(searchText) ||
-          item.image.data.includes(searchText)
+          item.image.html.includes(searchText)
         )) {
           bFound = true;
         }
@@ -671,12 +693,19 @@ function idClick(item: sicItem) {
         updateTable();
       }
     } else {
-      // add indeterminate select
+      // indeterminate select to normal and new indeterminate select start
       if((item.check & 0b100) === 0) {
         if(sicOptionsImgList.oosDisplay || (sicItemsImgList[i].check & 0b001)) {
+          for(i = 0; i < sicItemsImgList.length; i++) {
+            if(sicItemsImgList[i].check & 0b100) {
+              sicItemsImgList[i].check &= 0b011;
+              sicItemsImgList[i].check |= 0b010;
+            }
+          }
           item.check |= 0b100;
+          indeterminateIndex = [item.index, -1];
         }
-        updateRow(item);
+        updateTable();
       // cancel indeterminate select all
       } else {
         indeterminateIndex = [-1, -1];
@@ -795,10 +824,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let dlpath = '';
   
     if(item.image) {
-      const filename = ((item.image.url.match(/\/([^\/\?#&]+)(?:\?|#|&|$)/) || [])[1] || '').trim();
-      if(filename === '') {
-        return '';
-      }
+      let filename = ((item.image.url.match(/\/([^\/\?#&]+)(?:\?|#|&|$)/) || [])[1] || '').trim();
       let ext = ((filename.match(/\.([^.]*?)$/) || [])[1] || '').trim();
       if(ext === '') {
         if(item.image.mime !== '') {
@@ -810,6 +836,29 @@ document.addEventListener('DOMContentLoaded', () => {
       const pt = pagetitle.replace(/[<>:'"\/\\|?*\x00-\x1F]/g, '_').trim();
   
       dlpath = filename;
+
+      // if filename is empty, use the index
+      if(filename === '') {
+        filename = item.index.toString();
+        if(item.image.mime === 'image/bmp') {
+          filename += '.bmp';
+        } else if(item.image.mime === 'image/gif') {
+          filename += '.gif';
+        } else if(item.image.mime === 'image/tiff(LE)') {
+          filename += '.tiff';
+        } else if(item.image.mime === 'image/tiff(BE)') {
+          filename += '.tiff';
+        } else if(item.image.mime === 'image/webp') {
+          filename += '.webp';
+        } else if(item.image.mime === 'image/png') {
+          filename += '.png';
+        } else if(item.image.mime === 'image/jpeg') {
+          filename += '.jpeg';
+        } else if(item.image.mime === 'image/svg+xml') {
+          filename += '.svg';
+        }
+      }
+
       switch(sicOptionsImgList.dlFilenameType) {
         case 1:
           dlpath = pp + '/' + filename;
@@ -845,7 +894,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const datetime = getDLDatatime();
 
     for(const item of sicItemsImgList) {
-      if((item.check & 0b110) && (item.check & 0b001) && item.tag !== 'SVG') {
+      if((item.check & 0b110) && (item.check & 0b001)) {
         if(item.image) {
           chrome.downloads.download({
             filename: getDLFilename(datetime, item),
@@ -855,13 +904,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     }
+
+    const tstResult = <HTMLDivElement>document.getElementById('tstResult');
+    tstResult.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-warning');
+    tstResult.classList.add('text-bg-success');
+    tstResult.children[0].children[0].textContent = chrome.i18n.getMessage("download_started");
+    const toastBootstrap = bootstrap.Toast.getOrCreateInstance(tstResult);
+    toastBootstrap.show()
   });
 
 
   btnCopy.addEventListener('click', function () {
     let text = '';
     for(const item of sicItemsImgList) {
-      if((item.check & 0b110) && (item.check & 0b001) && item.tag !== 'SVG') {
+      if((item.check & 0b110) && (item.check & 0b001)) {
         if(text === '') {
           text += item.url;
         } else {
@@ -874,6 +930,13 @@ document.addEventListener('DOMContentLoaded', () => {
         navigator.clipboard.writeText(text);
       })();
     }
+
+    const tstResult = <HTMLDivElement>document.getElementById('tstResult');
+    tstResult.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-warning');
+    tstResult.classList.add('text-bg-success');
+    tstResult.children[0].children[0].textContent = chrome.i18n.getMessage("copied");
+    const toastBootstrap = bootstrap.Toast.getOrCreateInstance(tstResult);
+    toastBootstrap.show()
   });
 
   btnSendToAria2.addEventListener('click', function () {
@@ -882,7 +945,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const win = navigator.platform.startsWith("Win");
 
     for(const item of sicItemsImgList) {
-      if((item.check & 0b110) && (item.check & 0b001) && item.tag !== 'SVG') {
+      if((item.check & 0b110) && (item.check & 0b001) && item.a2able) {
         if(item.image) {
           if((win && sicOptionsImgList.a2DlDirW !== '') || (!win && sicOptionsImgList.a2DlDirP !== '')) {
             if(win) {
@@ -920,6 +983,13 @@ document.addEventListener('DOMContentLoaded', () => {
           })
         });
       })();
+
+      const tstResult = <HTMLDivElement>document.getElementById('tstResult');
+      tstResult.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-warning');
+      tstResult.classList.add('text-bg-success');
+      tstResult.children[0].children[0].textContent = chrome.i18n.getMessage("sent_to_aria2");
+      const toastBootstrap = bootstrap.Toast.getOrCreateInstance(tstResult);
+      toastBootstrap.show()
     }
 });
 
